@@ -5,6 +5,7 @@ export const Transactions: CollectionConfig = {
   admin: {
     useAsTitle: 'descricao',
     description: 'Controle financeiro e doações',
+    group: 'Financeiro',
   },
   access: {
     read: ({ req: { user } }) => Boolean(user?.role === 'Admin' || user?.role === 'Financeiro'),

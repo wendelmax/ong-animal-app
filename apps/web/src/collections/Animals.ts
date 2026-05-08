@@ -4,6 +4,13 @@ export const Animals: CollectionConfig = {
   slug: 'animals',
   admin: {
     useAsTitle: 'nome',
+    group: 'Gestão Animal',
+  },
+  access: {
+    read: ({ req: { user } }) => Boolean(user?.role === 'Admin' || user?.role === 'Voluntário' || user?.role === 'Veterinário'),
+    create: ({ req: { user } }) => Boolean(user?.role === 'Admin' || user?.role === 'Voluntário'),
+    update: ({ req: { user } }) => Boolean(user?.role === 'Admin' || user?.role === 'Voluntário' || user?.role === 'Veterinário'),
+    delete: ({ req: { user } }) => Boolean(user?.role === 'Admin'),
   },
   fields: [
     {

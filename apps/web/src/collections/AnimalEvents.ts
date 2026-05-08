@@ -4,6 +4,13 @@ export const AnimalEvents: CollectionConfig = {
   slug: 'animal-events',
   admin: {
     useAsTitle: 'tipo',
+    group: 'Gestão Animal',
+  },
+  access: {
+    read: ({ req: { user } }) => Boolean(user?.role === 'Admin' || user?.role === 'Voluntário' || user?.role === 'Veterinário'),
+    create: ({ req: { user } }) => Boolean(user?.role === 'Admin' || user?.role === 'Voluntário' || user?.role === 'Veterinário'),
+    update: ({ req: { user } }) => Boolean(user?.role === 'Admin' || user?.role === 'Veterinário'),
+    delete: ({ req: { user } }) => Boolean(user?.role === 'Admin'),
   },
   fields: [
     {

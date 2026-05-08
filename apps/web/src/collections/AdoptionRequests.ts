@@ -4,6 +4,13 @@ export const AdoptionRequests: CollectionConfig = {
   slug: 'adoption-requests',
   admin: {
     useAsTitle: 'nome',
+    group: 'Adoções',
+  },
+  access: {
+    read: ({ req: { user } }) => Boolean(user?.role === 'Admin' || user?.role === 'Voluntário'),
+    create: ({ req: { user } }) => true, // Público (pode vir do site)
+    update: ({ req: { user } }) => Boolean(user?.role === 'Admin' || user?.role === 'Voluntário'),
+    delete: ({ req: { user } }) => Boolean(user?.role === 'Admin'),
   },
   fields: [
     {

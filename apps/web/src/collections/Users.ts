@@ -9,10 +9,11 @@ export const Users: CollectionConfig = {
   slug: 'users',
   admin: {
     useAsTitle: 'email',
+    group: 'Administração',
   },
   auth: true,
   access: {
-    read: () => true,
+    read: isAdmin,
     create: isAdmin,
     update: isAdmin,
     delete: isAdmin,

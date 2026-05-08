@@ -5,9 +5,10 @@ export const Volunteers: CollectionConfig = {
   admin: {
     useAsTitle: 'nome',
     description: 'Cadastro de voluntários da ONG',
+    group: 'Administração',
   },
   access: {
-    read: ({ req: { user } }) => Boolean(user?.role === 'Admin' || user?.role === 'Voluntário'),
+    read: ({ req: { user } }) => Boolean(user?.role === 'Admin'),
     create: ({ req: { user } }) => Boolean(user?.role === 'Admin'),
     update: ({ req: { user } }) => Boolean(user?.role === 'Admin'),
     delete: ({ req: { user } }) => Boolean(user?.role === 'Admin'),

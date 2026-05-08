@@ -6,9 +6,10 @@ export const Tenants: CollectionConfig = {
   admin: {
     useAsTitle: 'name',
     description: 'Organizações parceiras e ONGs usando a plataforma (White Label).',
+    group: 'Administração',
   },
   access: {
-    read: () => true,
+    read: ({ req: { user } }) => Boolean((user as unknown as User)?.role === 'Admin'),
     create: ({ req: { user } }) => Boolean((user as unknown as User)?.role === 'Admin'),
     update: ({ req: { user } }) => Boolean((user as unknown as User)?.role === 'Admin'),
     delete: ({ req: { user } }) => Boolean((user as unknown as User)?.role === 'Admin'),

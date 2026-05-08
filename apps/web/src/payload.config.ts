@@ -15,6 +15,11 @@ import { Transactions } from './collections/Transactions'
 import { Volunteers } from './collections/Volunteers'
 import { DocumentTemplates } from './collections/DocumentTemplates'
 import { SignedDocuments } from './collections/SignedDocuments'
+import { Pages } from './collections/Pages'
+import { Posts } from './collections/Posts'
+import { Categories } from './collections/Categories'
+import { Header } from './globals/Header'
+import { Footer } from './globals/Footer'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -26,7 +31,22 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media, Animals, AnimalEvents, AdoptionRequests, Tenants, Transactions, Volunteers, DocumentTemplates, SignedDocuments],
+  collections: [
+    Users,
+    Media,
+    Animals,
+    AnimalEvents,
+    AdoptionRequests,
+    Tenants,
+    Transactions,
+    Volunteers,
+    DocumentTemplates,
+    SignedDocuments,
+    Pages,
+    Posts,
+    Categories,
+  ],
+  globals: [Header, Footer],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {

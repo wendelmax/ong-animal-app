@@ -5,6 +5,7 @@ export const SignedDocuments: CollectionConfig = {
   admin: {
     useAsTitle: 'id',
     description: 'Registro de termos assinados (Adoção, Responsabilidade, etc)',
+    group: 'Adoções',
   },
   access: {
     read: ({ req: { user } }) => Boolean(user?.role === 'Admin' || user?.role === 'Voluntário'),

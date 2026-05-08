@@ -5,9 +5,10 @@ export const DocumentTemplates: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     description: 'Modelos de documentos e termos (Adoção, Voluntariado, etc)',
+    group: 'Administração',
   },
   access: {
-    read: () => true,
+    read: ({ req: { user } }) => Boolean(user?.role === 'Admin'),
     create: ({ req: { user } }) => Boolean(user?.role === 'Admin'),
     update: ({ req: { user } }) => Boolean(user?.role === 'Admin'),
     delete: ({ req: { user } }) => Boolean(user?.role === 'Admin'),
