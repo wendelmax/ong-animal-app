@@ -36,6 +36,7 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URL || '',
     },
+    push: true, // Auto-cria as tabelas no banco de dados (ideal para início de projeto)
   }),
   sharp,
   plugins: [],
