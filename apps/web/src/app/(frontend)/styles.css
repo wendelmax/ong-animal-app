@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #f97316;
+  --color-secondary: #0ea5e9;
+  --font-sans: "Inter", sans-serif;
+}
+
+body {
+  @apply bg-zinc-50 text-zinc-900;
+}
