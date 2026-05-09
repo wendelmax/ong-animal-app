@@ -12,7 +12,7 @@ export const metadata = {
 
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
-import { Analytics } from '@vercel/analytics/react'
+import { Analytics } from '@vercel/analytics/next'
 
 export default async function RootLayout(props: { children: React.ReactNode }) {
   const { children } = props
