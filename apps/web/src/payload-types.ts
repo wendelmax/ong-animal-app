@@ -77,6 +77,9 @@ export interface Config {
     volunteers: Volunteer;
     'document-templates': DocumentTemplate;
     'signed-documents': SignedDocument;
+    pages: Page;
+    posts: Post;
+    categories: Category;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -94,6 +97,9 @@ export interface Config {
     volunteers: VolunteersSelect<false> | VolunteersSelect<true>;
     'document-templates': DocumentTemplatesSelect<false> | DocumentTemplatesSelect<true>;
     'signed-documents': SignedDocumentsSelect<false> | SignedDocumentsSelect<true>;
+    pages: PagesSelect<false> | PagesSelect<true>;
+    posts: PostsSelect<false> | PostsSelect<true>;
+    categories: CategoriesSelect<false> | CategoriesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -103,8 +109,14 @@ export interface Config {
     defaultIDType: number;
   };
   fallbackLocale: null;
-  globals: {};
-  globalsSelect: {};
+  globals: {
+    header: Header;
+    footer: Footer;
+  };
+  globalsSelect: {
+    header: HeaderSelect<false> | HeaderSelect<true>;
+    footer: FooterSelect<false> | FooterSelect<true>;
+  };
   locale: null;
   widgets: {
     collections: CollectionsWidget;
@@ -244,6 +256,9 @@ export interface Animal {
         id?: string | null;
       }[]
     | null;
+  cor?: string | null;
+  doencas?: string | null;
+  deficiencias?: string | null;
   dataResgate?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -301,10 +316,27 @@ export interface AdoptionRequest {
  */
 export interface Transaction {
   id: number;
+  /**
+   * Vincule este gasto ou receita a um animal específico para controle de custo.
+   */
+  animal?: (number | null) | Animal;
   tipo: 'Receita' | 'Despesa' | 'Doação';
   valor: number;
   descricao: string;
-  categoria?: string | null;
+  categoria?:
+    | (
+        | 'Ração'
+        | 'Veterinário/Consulta'
+        | 'Medicamentos'
+        | 'Exames'
+        | 'Transporte'
+        | 'Banho/Tosa'
+        | 'Evento/Rifa'
+        | 'Apadrinhamento'
+        | 'Infraestrutura'
+        | 'Outros'
+      )
+    | null;
   data: string;
   comprovante?: (number | null) | Media;
   updatedAt: string;
@@ -319,8 +351,12 @@ export interface Transaction {
 export interface Volunteer {
   id: number;
   nome: string;
-  contato: string;
-  funcao: 'Resgate' | 'Lar Temporário' | 'Transporte' | 'Eventos' | 'Administrativo';
+  whatsapp: string;
+  isLT?: boolean | null;
+  capacidadeLT?: number | null;
+  endereco?: string | null;
+  cidade?: string | null;
+  funcao: 'Resgate' | 'Lar Temporário' | 'Transporte' | 'Eventos' | 'Administrativo' | 'Marketing';
   disponibilidade?: string | null;
   ativo?: boolean | null;
   updatedAt: string;
@@ -373,6 +409,74 @@ export interface SignedDocument {
   signatureIp?: string | null;
   status: 'Assinado' | 'Revogado';
   generatedPdf?: (number | null) | Media;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages".
+ */
+export interface Page {
+  id: number;
+  title: string;
+  /**
+   * Ex: sobre-nos, como-ajudar
+   */
+  slug: string;
+  status: 'Rascunho' | 'Publicado';
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "posts".
+ */
+export interface Post {
+  id: number;
+  title: string;
+  category?: (number | null) | Category;
+  coverImage?: (number | null) | Media;
+  publishedAt?: string | null;
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories".
+ */
+export interface Category {
+  id: number;
+  title: string;
   updatedAt: string;
   createdAt: string;
 }
@@ -439,6 +543,18 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'signed-documents';
         value: number | SignedDocument;
+      } | null)
+    | ({
+        relationTo: 'pages';
+        value: number | Page;
+      } | null)
+    | ({
+        relationTo: 'posts';
+        value: number | Post;
+      } | null)
+    | ({
+        relationTo: 'categories';
+        value: number | Category;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -550,6 +666,9 @@ export interface AnimalsSelect<T extends boolean = true> {
         foto?: T;
         id?: T;
       };
+  cor?: T;
+  doencas?: T;
+  deficiencias?: T;
   dataResgate?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -614,6 +733,7 @@ export interface TenantsSelect<T extends boolean = true> {
  * via the `definition` "transactions_select".
  */
 export interface TransactionsSelect<T extends boolean = true> {
+  animal?: T;
   tipo?: T;
   valor?: T;
   descricao?: T;
@@ -629,7 +749,11 @@ export interface TransactionsSelect<T extends boolean = true> {
  */
 export interface VolunteersSelect<T extends boolean = true> {
   nome?: T;
-  contato?: T;
+  whatsapp?: T;
+  isLT?: T;
+  capacidadeLT?: T;
+  endereco?: T;
+  cidade?: T;
   funcao?: T;
   disponibilidade?: T;
   ativo?: T;
@@ -660,6 +784,40 @@ export interface SignedDocumentsSelect<T extends boolean = true> {
   signatureIp?: T;
   status?: T;
   generatedPdf?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages_select".
+ */
+export interface PagesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  status?: T;
+  content?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "posts_select".
+ */
+export interface PostsSelect<T extends boolean = true> {
+  title?: T;
+  category?: T;
+  coverImage?: T;
+  publishedAt?: T;
+  content?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories_select".
+ */
+export interface CategoriesSelect<T extends boolean = true> {
+  title?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -702,6 +860,72 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "header".
+ */
+export interface Header {
+  id: number;
+  navItems?:
+    | {
+        label: string;
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "footer".
+ */
+export interface Footer {
+  id: number;
+  copyright?: string | null;
+  socialLinks?:
+    | {
+        platform: 'Instagram' | 'Facebook' | 'Twitter' | 'YouTube';
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "header_select".
+ */
+export interface HeaderSelect<T extends boolean = true> {
+  navItems?:
+    | T
+    | {
+        label?: T;
+        url?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "footer_select".
+ */
+export interface FooterSelect<T extends boolean = true> {
+  copyright?: T;
+  socialLinks?:
+    | T
+    | {
+        platform?: T;
+        url?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

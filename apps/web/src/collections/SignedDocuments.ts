@@ -2,9 +2,14 @@ import type { CollectionConfig } from 'payload'
 
 export const SignedDocuments: CollectionConfig = {
   slug: 'signed-documents',
+  labels: {
+    singular: 'Documento Assinado',
+    plural: 'Documentos Assinados',
+  },
   admin: {
     useAsTitle: 'id',
     description: 'Registro de termos assinados (Adoção, Responsabilidade, etc)',
+    group: 'Administração',
   },
   access: {
     read: ({ req: { user } }) => Boolean(user?.role === 'Admin' || user?.role === 'Voluntário'),

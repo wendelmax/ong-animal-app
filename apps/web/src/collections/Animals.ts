@@ -2,8 +2,19 @@ import type { CollectionConfig } from 'payload'
 
 export const Animals: CollectionConfig = {
   slug: 'animals',
+  labels: {
+    singular: 'Animal',
+    plural: 'Animais',
+  },
   admin: {
     useAsTitle: 'nome',
+    group: 'Adoções',
+  },
+  access: {
+    read: ({ req: { user } }) => Boolean(user?.role === 'Admin' || user?.role === 'Voluntário' || user?.role === 'Veterinário'),
+    create: ({ req: { user } }) => Boolean(user?.role === 'Admin' || user?.role === 'Voluntário'),
+    update: ({ req: { user } }) => Boolean(user?.role === 'Admin' || user?.role === 'Voluntário' || user?.role === 'Veterinário'),
+    delete: ({ req: { user } }) => Boolean(user?.role === 'Admin'),
   },
   fields: [
     {
@@ -98,8 +109,30 @@ export const Animals: CollectionConfig = {
       ],
     },
     {
+      name: 'cor',
+      type: 'text',
+      label: 'Cor/Pelagem',
+    },
+    {
+      name: 'doencas',
+      type: 'textarea',
+      label: 'Doenças/Condições Médicas',
+      admin: {
+        placeholder: 'Descreva doenças crônicas ou tratamentos em andamento...',
+      },
+    },
+    {
+      name: 'deficiencias',
+      type: 'textarea',
+      label: 'Deficiências',
+      admin: {
+        placeholder: 'Ex: Cego, amputado, etc.',
+      },
+    },
+    {
       name: 'dataResgate',
       type: 'date',
+      label: 'Data de Resgate',
     },
   ],
 }

@@ -2,8 +2,19 @@ import type { CollectionConfig } from 'payload'
 
 export const AdoptionRequests: CollectionConfig = {
   slug: 'adoption-requests',
+  labels: {
+    singular: 'Pedido de Adoção',
+    plural: 'Pedidos de Adoção',
+  },
   admin: {
     useAsTitle: 'nome',
+    group: 'Adoções',
+  },
+  access: {
+    read: ({ req: { user } }) => Boolean(user?.role === 'Admin' || user?.role === 'Voluntário'),
+    create: ({ req: { user } }) => true, // Público (pode vir do site)
+    update: ({ req: { user } }) => Boolean(user?.role === 'Admin' || user?.role === 'Voluntário'),
+    delete: ({ req: { user } }) => Boolean(user?.role === 'Admin'),
   },
   fields: [
     {
