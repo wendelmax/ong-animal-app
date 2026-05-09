@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  db:
+  db-local:
     image: postgres:15-alpine
     container_name: ong-animal-db
     restart: always
