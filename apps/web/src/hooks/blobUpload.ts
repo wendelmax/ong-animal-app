@@ -10,8 +10,8 @@ export const uploadToBlob: CollectionAfterChangeHook = async ({ doc, req, operat
   if (operation !== 'create' && operation !== 'update') return doc
   if (!req.file) return doc
 
-  // Se já é uma URL do blob, não re-processa
-  if (doc.url && doc.url.includes('blob.vercel-storage.com')) return doc
+  // Se já tem blobUrl, não re-processa
+  if (doc.blobUrl) return doc
 
   const file = req.file
   const filename = `media/${Date.now()}-${file.name}`
@@ -29,7 +29,8 @@ export const uploadToBlob: CollectionAfterChangeHook = async ({ doc, req, operat
       id: doc.id,
       data: {
         url: blob.url,
-        thumbnailURL: blob.url, // Usa o mesmo blob para thumbnail por enquanto
+        blobUrl: blob.url,
+        thumbnailURL: blob.url,
         filesize: file.size,
         width: doc.width,
         height: doc.height,
@@ -40,6 +41,7 @@ export const uploadToBlob: CollectionAfterChangeHook = async ({ doc, req, operat
     return { 
       ...doc, 
       url: blob.url, 
+      blobUrl: blob.url,
       thumbnailURL: blob.url,
       filesize: file.size 
     }

@@ -19,12 +19,28 @@ export const Media: CollectionConfig = {
   hooks: {
     afterChange: [uploadToBlob],
     afterDelete: [deleteFromBlob],
+    afterRead: [
+      ({ doc }) => {
+        if (doc.blobUrl) {
+          doc.url = doc.blobUrl
+        }
+        return doc
+      },
+    ],
   },
   fields: [
     {
       name: 'alt',
       type: 'text',
       required: true,
+    },
+    {
+      name: 'blobUrl',
+      type: 'text',
+      admin: {
+        readOnly: true,
+        position: 'sidebar',
+      },
     },
   ],
   upload: {
