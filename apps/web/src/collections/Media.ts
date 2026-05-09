@@ -26,15 +26,9 @@ export const Media: CollectionConfig = {
       type: 'text',
       required: true,
     },
-    {
-      name: 'blobUrl',
-      type: 'text',
-      admin: {
-        readOnly: true,
-        position: 'sidebar',
-        description: 'URL do arquivo no Vercel Blob (preenchido automaticamente)',
-      },
-    },
   ],
-  upload: true,
+  upload: {
+    disableLocalStorage: true,
+    mimeTypes: ['image/*', 'application/pdf'],
+  },
 }
