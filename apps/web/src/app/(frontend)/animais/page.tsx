@@ -1,104 +1,123 @@
 import { getPayload } from 'payload'
-import configPromise from '@payload-config'
-import Image from 'next/image'
+import config from '@/payload.config'
+import React from 'react'
 import Link from 'next/link'
+import { Heart, Filter, ArrowRight, PawPrint } from 'lucide-react'
 
-export const dynamic = 'force-dynamic' // Optional, but useful for testing without caching
+export const metadata = {
+  title: 'Nossos Animais | Viralatinhas Sumaré',
+  description: 'Conheça os cães e gatos disponíveis para adoção responsável em Sumaré.',
+}
 
-export default async function AnimaisPage() {
-  const payload = await getPayload({ config: configPromise })
+export default async function AnimalsPage() {
+  const payload = await getPayload({ config })
 
-  // Fetch only animals that are 'Disponível' for adoption
-  const { docs: animais } = await payload.find({
+  const { docs: animals } = await payload.find({
     collection: 'animals',
     where: {
       status: {
         equals: 'Disponível',
       },
     },
-    depth: 1, // To populate media (photos)
+    sort: '-dataResgate',
   })
 
   return (
-    <div className="min-h-screen bg-zinc-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-extrabold text-zinc-900 sm:text-5xl tracking-tight">
-            Nossos Focinhos para Adoção
+    <div className="min-h-screen bg-zinc-50 pt-32 pb-24">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header Section */}
+        <div className="text-center mb-16">
+          <Link 
+            href="/adocao-responsavel"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-orange/10 text-brand-orange text-sm font-black mb-6 uppercase tracking-widest hover:bg-brand-orange hover:text-white transition-all cursor-pointer"
+          >
+            <PawPrint className="w-4 h-4" /> Adoção Responsável
+          </Link>
+          <h1 className="text-5xl md:text-7xl font-black text-zinc-900 tracking-tighter mb-6">
+            Encontre seu novo <br />
+            <span className="text-brand-magenta">melhor amigo.</span>
           </h1>
-          <p className="mt-4 text-xl text-zinc-600">
-            Conheça os animais que estão esperando por um lar cheio de amor.
+          <p className="text-xl text-zinc-600 max-w-2xl mx-auto font-medium">
+            Todos os nossos animais são entregues castrados, vacinados e com muito amor para oferecer.
           </p>
         </div>
 
-        {animais.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-2xl shadow-sm border border-zinc-100">
-            <p className="text-zinc-500 text-lg">Nenhum animal disponível para adoção no momento.</p>
-            <p className="text-zinc-400 mt-2">Volte mais tarde ou entre em contato com a ONG!</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {animais.map((animal) => {
-              // Extract the first photo if it exists
-              const fotoUrl =
-                animal.fotos && animal.fotos.length > 0 && typeof animal.fotos[0].foto === 'object'
-                  ? (animal.fotos[0].foto as any).url
-                  : '/placeholder-pet.png'
+        {/* Filter Bar (Placeholder for now) */}
+        <div className="flex flex-wrap items-center justify-center gap-4 mb-16">
+          <button className="px-8 py-3 bg-brand-blue text-white font-black rounded-full shadow-lg shadow-brand-blue/20 hover:scale-105 transition-all">
+            Todos
+          </button>
+          <button className="px-8 py-3 bg-white text-zinc-600 font-bold rounded-full border border-zinc-200 hover:border-brand-blue hover:text-brand-blue transition-all">
+            Cachorros
+          </button>
+          <button className="px-8 py-3 bg-white text-zinc-600 font-bold rounded-full border border-zinc-200 hover:border-brand-blue hover:text-brand-blue transition-all">
+            Gatos
+          </button>
+        </div>
 
-              return (
-                <div
-                  key={animal.id}
-                  className="bg-white rounded-3xl shadow-sm hover:shadow-xl transition-all duration-300 border border-zinc-100 overflow-hidden group flex flex-col"
-                >
-                  <div className="relative h-64 w-full bg-zinc-100 overflow-hidden">
+        {/* Animals Grid */}
+        {animals.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+            {animals.map((animal) => (
+              <Link
+                key={animal.id}
+                href={`/animais/${animal.slug}`}
+                className="group bg-white rounded-[2.5rem] overflow-hidden border border-zinc-100 shadow-sm hover:shadow-2xl transition-all duration-500"
+              >
+                {/* Photo Container */}
+                <div className="relative h-80 overflow-hidden">
+                  {animal.fotos?.[0]?.foto && typeof animal.fotos[0].foto === 'object' && 'url' in animal.fotos[0].foto ? (
                     <img
-                      src={fotoUrl}
-                      alt={`Foto de ${animal.nome}`}
-                      className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
+                      src={animal.fotos[0].foto.url || ''}
+                      alt={animal.nome}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                     />
-                    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-semibold text-primary">
+                  ) : (
+                    <div className="w-full h-full bg-zinc-200 flex items-center justify-center">
+                      <PawPrint className="w-16 h-16 text-zinc-400" />
+                    </div>
+                  )}
+                  
+                  {/* Badge */}
+                  <div className="absolute top-6 left-6">
+                    <span className="px-4 py-2 bg-white/90 backdrop-blur-md text-zinc-900 text-xs font-black uppercase tracking-widest rounded-full shadow-sm">
                       {animal.especie}
-                    </div>
-                  </div>
-                  <div className="p-6 flex flex-col flex-grow">
-                    <h2 className="text-2xl font-bold text-zinc-900 mb-2">{animal.nome}</h2>
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-zinc-100 text-zinc-800">
-                        {animal.sexo}
-                      </span>
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-zinc-100 text-zinc-800">
-                        Porte {animal.porte}
-                      </span>
-                      {animal.idade ? (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-zinc-100 text-zinc-800">
-                          {animal.idade} anos
-                        </span>
-                      ) : null}
-                    </div>
-                    <p className="text-zinc-600 line-clamp-3 mb-6">
-                      {animal.descricao || 'Este animalzinho está aguardando uma família.'}
-                    </p>
-                    
-                    <div className="mt-auto pt-4 border-t border-zinc-100 flex items-center justify-between">
-                      <div className="flex space-x-2">
-                        {animal.castrado && (
-                          <span title="Castrado" className="text-zinc-400">✂️</span>
-                        )}
-                        {animal.vacinado && (
-                          <span title="Vacinado" className="text-zinc-400">💉</span>
-                        )}
-                      </div>
-                      <Link
-                        href={`/animais/${animal.slug}`}
-                        className="inline-flex items-center justify-center px-5 py-2.5 border border-transparent text-sm font-medium rounded-xl text-white bg-primary hover:bg-orange-600 shadow-sm transition-colors"
-                      >
-                        Conhecer
-                      </Link>
-                    </div>
+                    </span>
                   </div>
                 </div>
-              )
-            })}
+
+                {/* Content */}
+                <div className="p-10">
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <h3 className="text-3xl font-black text-zinc-900 group-hover:text-brand-blue transition-colors">
+                        {animal.nome}
+                      </h3>
+                      <p className="text-zinc-500 font-bold uppercase text-xs tracking-widest mt-1">
+                        {animal.porte} • {animal.idade ? `${animal.idade} anos` : 'Idade desconhecida'}
+                      </p>
+                    </div>
+                    <div className="w-12 h-12 bg-zinc-50 rounded-2xl flex items-center justify-center text-brand-magenta group-hover:bg-brand-magenta group-hover:text-white transition-all">
+                      <Heart className="w-6 h-6" />
+                    </div>
+                  </div>
+
+                  <p className="text-zinc-600 line-clamp-2 mb-8 font-medium leading-relaxed">
+                    {animal.descricao || 'Um animal amoroso esperando por um lar definitivo.'}
+                  </p>
+
+                  <div className="flex items-center gap-2 text-brand-blue font-black uppercase text-sm tracking-widest group-hover:gap-4 transition-all">
+                    Conhecer história <ArrowRight className="w-5 h-5" />
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-32 bg-white rounded-[3rem] border-2 border-dashed border-zinc-200">
+            <PawPrint className="w-20 h-20 text-zinc-200 mx-auto mb-6" />
+            <h2 className="text-3xl font-black text-zinc-900 mb-4">Nenhum animal disponível no momento</h2>
+            <p className="text-zinc-500 font-medium">Continue acompanhando, novos amigos chegam todos os dias!</p>
           </div>
         )}
       </div>
