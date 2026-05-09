@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { uploadToBlob, deleteFromBlob } from '../hooks/blobUpload'
+import { uploadToBlob } from '../hooks/blobUpload'
 
 export const Media: CollectionConfig = {
   slug: 'media',
@@ -17,32 +17,13 @@ export const Media: CollectionConfig = {
     delete: ({ req: { user } }) => Boolean(user?.role === 'Admin'),
   },
   hooks: {
-    afterChange: [uploadToBlob],
-    afterDelete: [deleteFromBlob],
-    afterRead: [
-      ({ doc }: { doc: any }) => {
-        // Usa urlOverride se existir para apontar para o Blob
-        if (doc && doc.urlOverride) {
-          doc.url = doc.urlOverride
-        }
-        return doc
-      },
-    ],
+    beforeChange: [uploadToBlob],
   },
   fields: [
     {
       name: 'alt',
       type: 'text',
       required: true,
-    },
-    {
-      name: 'urlOverride',
-      type: 'text',
-      admin: {
-        readOnly: true,
-        position: 'sidebar',
-        description: 'URL persistente no Vercel Blob',
-      },
     },
   ],
   upload: {
