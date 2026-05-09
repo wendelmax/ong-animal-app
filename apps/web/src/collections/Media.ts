@@ -20,7 +20,7 @@ export const Media: CollectionConfig = {
     afterChange: [uploadToBlob],
     afterDelete: [deleteFromBlob],
     afterRead: [
-      ({ doc }) => {
+      ({ doc }: { doc: any }) => {
         if (doc.blobUrl) {
           doc.url = doc.blobUrl
         }
