@@ -26,6 +26,7 @@
     "cross-env": "^7.0.3",
     "dotenv": "^16.4.7",
     "graphql": "^16.8.1",
+    "lucide-react": "^1.14.0",
     "next": "^16.2.6",
     "payload": "^3.0.0",
     "react": "19.0.0",
