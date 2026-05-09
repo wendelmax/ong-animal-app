@@ -6,12 +6,15 @@ export const metadata = {
   title: 'Payload Blank Template',
 }
 
+import { Header } from '@/components/Header'
+
 export default async function RootLayout(props: { children: React.ReactNode }) {
   const { children } = props
 
   return (
-    <html lang="en">
+    <html lang="pt-BR">
       <body>
+        <Header />
         <main>{children}</main>
       </body>
     </html>
