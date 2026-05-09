@@ -17,7 +17,7 @@ export const Media: CollectionConfig = {
     delete: ({ req: { user } }) => Boolean(user?.role === 'Admin'),
   },
   hooks: {
-    beforeChange: [uploadToBlob],
+    afterChange: [uploadToBlob],
     afterDelete: [deleteFromBlob],
   },
   fields: [

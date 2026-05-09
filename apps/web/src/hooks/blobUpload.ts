@@ -1,13 +1,17 @@
 import { put, del } from '@vercel/blob'
-import type { CollectionBeforeChangeHook, CollectionAfterDeleteHook } from 'payload'
+import type { CollectionAfterChangeHook, CollectionAfterDeleteHook } from 'payload'
 
 /**
- * Hook que intercepta o upload de mídia e envia para o Vercel Blob Storage.
- * Usa @vercel/blob diretamente, sem @payloadcms/plugin-cloud-storage.
+ * Hook que roda DEPOIS do Payload processar o upload.
+ * Envia o arquivo para o Vercel Blob e atualiza a URL no documento.
  */
-export const uploadToBlob: CollectionBeforeChangeHook = async ({ data, req }) => {
-  if (!process.env.BLOB_READ_WRITE_TOKEN) return data
-  if (!req.file) return data
+export const uploadToBlob: CollectionAfterChangeHook = async ({ doc, req, operation }) => {
+  if (!process.env.BLOB_READ_WRITE_TOKEN) return doc
+  if (operation !== 'create' && operation !== 'update') return doc
+  if (!req.file) return doc
+
+  // Se já é uma URL do blob, não re-processa
+  if (doc.url && doc.url.includes('blob.vercel-storage.com')) return doc
 
   const file = req.file
   const filename = `media/${Date.now()}-${file.name}`
@@ -19,17 +23,20 @@ export const uploadToBlob: CollectionBeforeChangeHook = async ({ data, req }) =>
       contentType: file.mimetype,
     })
 
-    // Usa o campo url nativo do Payload
-    return {
-      ...data,
-      url: blob.url,
-      filename: file.name,
-      mimeType: file.mimetype,
-      filesize: file.size,
-    }
+    // Atualiza diretamente no banco com a URL do blob
+    await req.payload.update({
+      collection: 'media',
+      id: doc.id,
+      data: {
+        url: blob.url,
+      },
+      overrideAccess: true,
+    })
+
+    return { ...doc, url: blob.url }
   } catch (error) {
     console.error('[Blob Upload] Error:', error)
-    return data
+    return doc
   }
 }
 
