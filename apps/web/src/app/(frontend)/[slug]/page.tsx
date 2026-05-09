@@ -34,15 +34,19 @@ export default async function Page({ params }: PageProps) {
   }
 
   return (
-    <article className="min-h-screen bg-white py-20">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <header className="mb-12 text-center">
-          <h1 className="text-4xl md:text-6xl font-black text-zinc-900 tracking-tight mb-4">
+    <article className="min-h-screen bg-white pb-20">
+      {/* Page Hero */}
+      <section className="bg-brand-blue py-16 md:py-24 text-center mb-12 relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-brand-magenta/20 to-transparent pointer-events-none" />
+        <div className="max-w-4xl mx-auto px-4 relative z-10">
+          <h1 className="text-4xl md:text-6xl font-black text-white tracking-tight mb-4 drop-shadow-sm">
             {page.title}
           </h1>
-          <div className="h-1.5 w-24 bg-gradient-to-r from-brand-blue via-brand-magenta to-brand-orange mx-auto rounded-full" />
-        </header>
+          <div className="h-1.5 w-24 bg-brand-orange mx-auto rounded-full" />
+        </div>
+      </section>
 
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="prose prose-lg prose-zinc max-w-none prose-headings:font-black prose-headings:tracking-tight prose-p:leading-relaxed">
           {page.content && <RichText data={page.content} />}
         </div>

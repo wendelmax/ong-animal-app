@@ -11,6 +11,7 @@ export const metadata = {
 }
 
 import { Header } from '@/components/Header'
+import { Footer } from '@/components/Footer'
 
 export default async function RootLayout(props: { children: React.ReactNode }) {
   const { children } = props
@@ -19,7 +20,8 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
     <html lang="pt-BR">
       <body>
         <Header />
-        <main>{children}</main>
+        <main className="min-h-[70vh]">{children}</main>
+        <Footer />
       </body>
     </html>
   )
