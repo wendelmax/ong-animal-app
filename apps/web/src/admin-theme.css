@@ -1,9 +1,3 @@
-/* ===================================================
-   VIRALATINHAS ADMIN THEME
-   Payload CMS 3.0 Custom Styles
-   Injetado via custom.scss no layout do admin
-   =================================================== */
-
 :root {
   --theme-bg: #ffffff;
   --theme-text: #0f172a;
@@ -32,6 +26,7 @@
   height: 80px !important;
 }
 
+/* Ajuste do Título/Breadcrumb no Header */
 .template-default__header h1, 
 .template-default__header .breadcrumb {
   font-weight: 800 !important;
@@ -43,29 +38,27 @@
 body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
   letter-spacing: -0.01em;
-  font-size: 18px !important;
+  font-size: 18px !important; /* Aumentado para melhor visibilidade */
 }
 
-/* Sidebar Dark */
-[class*="nav--"] {
-  background-color: #111827 !important;
+/* Sidebar Overhaul */
+.sidebar {
+  background-color: #111827 !important; /* Dark sidebar como no modelo */
   border-right: 1px solid #1f2937 !important;
 }
 
-[class*="nav-group__label"],
 .nav-group__label {
   color: #9ca3af !important;
   font-weight: 900 !important;
   text-transform: uppercase !important;
   letter-spacing: 0.15em !important;
-  font-size: 0.85rem !important;
+  font-size: 0.85rem !important; /* Fonte maior */
   padding: 2.5rem 1.5rem 0.75rem !important;
 }
 
-[class*="nav__link"],
 .nav__link {
   font-weight: 700 !important;
-  font-size: 1.1rem !important;
+  font-size: 1.1rem !important; /* Fonte maior para acessibilidade */
   color: #d1d5db !important;
   padding: 1rem 1.5rem !important;
   margin: 0.4rem 1rem !important;
@@ -73,17 +66,34 @@ body {
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
-[class*="nav__link"]:hover,
 .nav__link:hover {
   background-color: rgba(255, 255, 255, 0.05) !important;
   color: #ffffff !important;
 }
 
-[class*="nav__link--active"],
 .nav__link--active {
-  background-color: #4f46e5 !important;
+  background-color: #4f46e5 !important; /* Indigo/Blue do modelo */
   color: #ffffff !important;
   box-shadow: 0 4px 20px rgba(79, 70, 229, 0.3) !important;
+}
+
+/* Semantic Status Colors in Tables/Lists */
+/* Note: These selectors are generic and might need refinement based on exact Payload 3.0 DOM */
+[data-field-name="status"] .pill,
+[data-field-name="status"] .status-pill {
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+}
+
+/* Specific badge colors using attribute matching if possible */
+.pill--success, [title="Disponível"] .pill { background: #ecfdf5 !important; color: #059669 !important; }
+.pill--warning, [title="Em tratamento"] .pill { background: #fff7ed !important; color: #d97706 !important; }
+.pill--error, [title="Urgente"] .pill { background: #fff1f2 !important; color: #e11d48 !important; }
+
+/* Dashboard Styling Overrides */
+.dashboard__group {
+  margin-bottom: 3rem !important;
 }
 
 /* Tables */
@@ -100,7 +110,7 @@ body {
 .table td {
   padding: 1.5rem 1.5rem !important;
   font-weight: 600 !important;
-  font-size: 1.05rem !important;
+  font-size: 1.05rem !important; /* Aumentado */
 }
 
 /* Buttons */
@@ -178,16 +188,17 @@ body {
 }
 
 .login .admin-logo-img {
-  width: 140px !important;
+  width: 140px !important; /* Logo grande no login */
   height: 140px !important;
   background-color: transparent !important;
   padding: 0 !important;
 }
 
 .login .admin-logo-text {
-  display: none !important;
+  display: none !important; /* Remove VIRALATINHAS Sumaré - SP no login */
 }
 
+/* Aumentar fonte do formulário de login */
 .login form {
   font-size: 1.2rem !important;
 }
@@ -208,3 +219,4 @@ body {
   font-weight: 700 !important;
   margin-bottom: 0.5rem !important;
 }
+
