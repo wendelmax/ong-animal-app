@@ -18,6 +18,15 @@ export const Media: CollectionConfig = {
   },
   hooks: {
     beforeChange: [uploadToBlob],
+    afterRead: [
+      ({ doc }) => {
+        const blobHost = 'https://qhu14etz7tk70zzr.public.blob.vercel-storage.com'
+        if (doc.filename) {
+          doc.url = `${blobHost}/media/${doc.filename}`
+        }
+        return doc
+      },
+    ],
   },
   fields: [
     {

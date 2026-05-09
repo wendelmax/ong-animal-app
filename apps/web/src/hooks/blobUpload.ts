@@ -14,6 +14,7 @@ export const uploadToBlob: CollectionBeforeChangeHook = async ({ data, req, oper
   if (data.url && data.url.includes('blob.vercel-storage.com')) return data
 
   const file = req.file
+  try {
     // Usamos o nome único gerado para o Payload não reclamar de duplicata
     const uniqueFilename = `${Date.now()}-${file.name}`
 
