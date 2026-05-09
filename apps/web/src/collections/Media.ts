@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { uploadToBlob, deleteFromBlob } from '../hooks/blobUpload'
+// import { uploadToBlob, deleteFromBlob } from '../hooks/blobUpload'
 
 export const Media: CollectionConfig = {
   slug: 'media',
@@ -16,6 +16,7 @@ export const Media: CollectionConfig = {
     update: ({ req: { user } }) => Boolean(user?.role === 'Admin' || user?.role === 'Marketing' || user?.role === 'Voluntário' || user?.role === 'Veterinário'),
     delete: ({ req: { user } }) => Boolean(user?.role === 'Admin'),
   },
+  /*
   hooks: {
     afterChange: [uploadToBlob],
     afterDelete: [deleteFromBlob],
@@ -28,6 +29,7 @@ export const Media: CollectionConfig = {
       },
     ],
   },
+  */
   fields: [
     {
       name: 'alt',
