@@ -9,12 +9,10 @@ export const Header = () => {
         <div className="flex justify-between items-center h-20">
           <Link href="/" className="flex items-center gap-3 group">
             <div className="relative h-12 w-32 sm:h-16 sm:w-40 transition-transform group-hover:scale-105">
-              <Image
+              <img
                 src="/logo.png"
                 alt="Viralatinhas Logo"
-                fill
-                className="object-contain"
-                priority
+                className="h-full w-full object-contain"
               />
             </div>
           </Link>
