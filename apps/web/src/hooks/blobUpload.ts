@@ -24,7 +24,6 @@ export const uploadToBlob: CollectionAfterChangeHook = async ({ doc, req, operat
     })
 
     // Atualiza diretamente no banco com a URL do blob e metadados
-    // @ts-ignore - blobUrl pode não estar no tipo gerado ainda
     await req.payload.update({
       collection: 'media',
       id: doc.id,
@@ -35,7 +34,7 @@ export const uploadToBlob: CollectionAfterChangeHook = async ({ doc, req, operat
         filesize: file.size,
         width: (doc as any).width,
         height: (doc as any).height,
-      },
+      } as any,
       overrideAccess: true,
     })
 
