@@ -10,8 +10,8 @@ export const uploadToBlob: CollectionAfterChangeHook = async ({ doc, req, operat
   if (operation !== 'create' && operation !== 'update') return doc
   if (!req.file) return doc
 
-  // Se já tem blobUrl, não re-processa
-  if (doc.blobUrl) return doc
+  // Se já tem urlOverride, não re-processa
+  if (doc && (doc as any).urlOverride) return doc
 
   const file = req.file
   const filename = `media/${Date.now()}-${file.name}`
@@ -28,8 +28,7 @@ export const uploadToBlob: CollectionAfterChangeHook = async ({ doc, req, operat
       collection: 'media',
       id: doc.id,
       data: {
-        url: blob.url,
-        blobUrl: blob.url,
+        urlOverride: blob.url,
         thumbnailURL: blob.url,
         filesize: file.size,
         width: (doc as any).width,
@@ -41,7 +40,7 @@ export const uploadToBlob: CollectionAfterChangeHook = async ({ doc, req, operat
     return { 
       ...doc, 
       url: blob.url, 
-      blobUrl: blob.url,
+      urlOverride: blob.url,
       thumbnailURL: blob.url,
       filesize: file.size 
     } as any
