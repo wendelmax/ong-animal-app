@@ -18,8 +18,8 @@ export default function HomePage() {
         <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-96 h-96 bg-brand-magenta/10 rounded-full blur-3xl -z-10" />
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-magenta/10 text-brand-magenta text-sm font-black mb-8 border border-brand-magenta/20">
-            <span className="animate-bounce">🐾</span> Viralatinhas Sumaré: Amor em Movimento
+          <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-zinc-100 text-zinc-500 text-xs font-bold mb-8 uppercase tracking-[0.2em] border border-zinc-200">
+            Associação Viralatinhas de Sumaré • Desde 2002
           </div>
           
           <h1 className="text-6xl md:text-8xl font-black text-zinc-900 tracking-tighter mb-8 leading-[0.9]">
