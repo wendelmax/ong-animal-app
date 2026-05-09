@@ -4,7 +4,7 @@ import path from 'path'
 import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 import { pt } from '@payloadcms/translations/languages/pt'
-import { uploadthingStorage } from '@payloadcms/storage-uploadthing'
+// Storage adapters (vercel-blob, uploadthing) crash admin hydration via plugin-cloud-storage
 import sharp from 'sharp'
 
 import { Users } from './collections/Users'
@@ -78,19 +78,5 @@ export default buildConfig({
     push: true, // Auto-cria as tabelas no banco de dados (ideal para início de projeto)
   }),
   sharp,
-  plugins: [
-    ...(process.env.UPLOADTHING_TOKEN
-      ? [
-          uploadthingStorage({
-            collections: {
-              media: true,
-            },
-            options: {
-              token: process.env.UPLOADTHING_TOKEN,
-              acl: 'public-read',
-            },
-          }),
-        ]
-      : []),
-  ],
+  plugins: [],
 })
