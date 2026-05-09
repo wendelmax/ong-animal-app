@@ -3,7 +3,7 @@ import type { CollectionBeforeChangeHook, CollectionAfterDeleteHook } from 'payl
 
 /**
  * Hook que intercepta o upload de mídia e envia para o Vercel Blob Storage.
- * Isso substitui o @payloadcms/storage-vercel-blob que causa crash de hidratação.
+ * Usa @vercel/blob diretamente, sem @payloadcms/plugin-cloud-storage.
  */
 export const uploadToBlob: CollectionBeforeChangeHook = async ({ data, req }) => {
   if (!process.env.BLOB_READ_WRITE_TOKEN) return data
@@ -19,11 +19,10 @@ export const uploadToBlob: CollectionBeforeChangeHook = async ({ data, req }) =>
       contentType: file.mimetype,
     })
 
-    // Salva a URL do blob no documento
+    // Usa o campo url nativo do Payload
     return {
       ...data,
       url: blob.url,
-      blobUrl: blob.url,
       filename: file.name,
       mimeType: file.mimetype,
       filesize: file.size,
@@ -39,10 +38,11 @@ export const uploadToBlob: CollectionBeforeChangeHook = async ({ data, req }) =>
  */
 export const deleteFromBlob: CollectionAfterDeleteHook = async ({ doc }) => {
   if (!process.env.BLOB_READ_WRITE_TOKEN) return
-  if (!doc?.blobUrl) return
+  const url = doc?.url
+  if (!url || !url.includes('blob.vercel-storage.com')) return
 
   try {
-    await del(doc.blobUrl, { token: process.env.BLOB_READ_WRITE_TOKEN })
+    await del(url, { token: process.env.BLOB_READ_WRITE_TOKEN })
   } catch (error) {
     console.error('[Blob Delete] Error:', error)
   }
