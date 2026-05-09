@@ -2,6 +2,11 @@ import Link from 'next/link'
 import React from 'react'
 import './styles.css'
 
+export const metadata = {
+  title: 'Viralatinhas Sumaré | Proteção e Bem-Estar Animal',
+  description: 'ONG independente dedicada ao controle populacional e promoção da adoção responsável em Sumaré.',
+}
+
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-white">
@@ -22,8 +27,7 @@ export default function HomePage() {
           </h1>
           
           <p className="mt-4 text-xl text-zinc-600 max-w-2xl mx-auto leading-relaxed mb-12">
-            Somos uma ONG independente dedicada ao resgate, cuidado e adoção de animais em Sumaré. 
-            Junte-se a nós para transformar a vida de um vira-lata.
+            Atuamos na proteção e bem-estar de cães e gatos em Sumaré, focando no controle populacional e na promoção da adoção responsável.
           </p>
 
           <div className="flex flex-col sm:flex-row justify-center items-center gap-6">

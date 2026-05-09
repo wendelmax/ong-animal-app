@@ -2,8 +2,12 @@ import React from 'react'
 import './styles.css'
 
 export const metadata = {
-  description: 'A blank template using Payload in a Next.js app.',
-  title: 'Payload Blank Template',
+  metadataBase: new URL('https://www.viralatinhas.com'),
+  title: {
+    default: 'Viralatinhas Sumaré',
+    template: '%s | Viralatinhas Sumaré',
+  },
+  description: 'ONG independente dedicada à proteção e bem-estar de cães e gatos em Sumaré-SP.',
 }
 
 import { Header } from '@/components/Header'
