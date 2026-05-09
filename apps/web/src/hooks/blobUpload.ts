@@ -14,10 +14,10 @@ export const uploadToBlob: CollectionBeforeChangeHook = async ({ data, req, oper
   if (data.url && data.url.includes('blob.vercel-storage.com')) return data
 
   const file = req.file
-  const filename = `media/${Date.now()}-${file.name}`
+    // Usamos o nome único gerado para o Payload não reclamar de duplicata
+    const uniqueFilename = `${Date.now()}-${file.name}`
 
-  try {
-    const blob = await put(filename, file.data, {
+    const blob = await put(`media/${uniqueFilename}`, file.data, {
       access: 'public',
       token: process.env.BLOB_READ_WRITE_TOKEN,
       contentType: file.mimetype,
@@ -27,7 +27,7 @@ export const uploadToBlob: CollectionBeforeChangeHook = async ({ data, req, oper
     return {
       ...data,
       url: blob.url,
-      filename: file.name,
+      filename: uniqueFilename, // Nome único para o banco de dados
       filesize: file.size,
       mimeType: file.mimetype,
     }
