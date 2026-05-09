@@ -36,14 +36,6 @@ export const Media: CollectionConfig = {
       type: 'text',
       required: true,
     },
-    {
-      name: 'blobUrl',
-      type: 'text',
-      admin: {
-        readOnly: true,
-        position: 'sidebar',
-      },
-    },
   ],
   upload: {
     disableLocalStorage: true,
