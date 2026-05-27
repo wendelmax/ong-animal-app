@@ -11,7 +11,7 @@ export const Posts: CollectionConfig = {
     group: 'Conteúdo',
   },
   access: {
-    read: ({ req: { user } }) => Boolean(user?.role === 'Admin' || user?.role === 'Marketing'),
+    read: () => true,
     create: ({ req: { user } }) => Boolean(user?.role === 'Admin' || user?.role === 'Marketing'),
     update: ({ req: { user } }) => Boolean(user?.role === 'Admin' || user?.role === 'Marketing'),
     delete: ({ req: { user } }) => Boolean(user?.role === 'Admin'),
@@ -22,6 +22,14 @@ export const Posts: CollectionConfig = {
       type: 'text',
       required: true,
       label: 'Título da Postagem',
+    },
+    {
+      name: 'excerpt',
+      type: 'textarea',
+      label: 'Resumo Breve',
+      admin: {
+        description: 'Um resumo curto para aparecer no feed de notícias na página inicial.',
+      },
     },
     {
       name: 'category',

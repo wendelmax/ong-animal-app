@@ -449,6 +449,10 @@ export interface Page {
 export interface Post {
   id: number;
   title: string;
+  /**
+   * Um resumo curto para aparecer no feed de notícias na página inicial.
+   */
+  excerpt?: string | null;
   category?: (number | null) | Category;
   coverImage?: (number | null) | Media;
   publishedAt?: string | null;
@@ -805,6 +809,7 @@ export interface PagesSelect<T extends boolean = true> {
  */
 export interface PostsSelect<T extends boolean = true> {
   title?: T;
+  excerpt?: T;
   category?: T;
   coverImage?: T;
   publishedAt?: T;

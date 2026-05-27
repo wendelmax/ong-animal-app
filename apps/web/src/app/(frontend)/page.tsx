@@ -1,14 +1,26 @@
 import Link from 'next/link'
 import React from 'react'
 import './styles.css'
-import { Heart, ShieldCheck, Zap, Info, ArrowRight } from 'lucide-react'
+import { Heart, ShieldCheck, Zap, Info, ArrowRight, BookOpen } from 'lucide-react'
+import { getPayload } from 'payload'
+import config from '@payload-config'
 
 export const metadata = {
   title: 'Viralatinhas Sumaré | Proteção e Bem-Estar Animal',
   description: 'ONG independente dedicada ao controle populacional e promoção da adoção responsável em Sumaré.',
 }
 
-export default function HomePage() {
+export const dynamic = 'force-dynamic'
+
+export default async function HomePage() {
+  const payload = await getPayload({ config })
+  
+  const { docs: posts } = await payload.find({
+    collection: 'posts',
+    limit: 3,
+    sort: '-publishedAt',
+  })
+
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
@@ -83,6 +95,65 @@ export default function HomePage() {
               <p className="text-zinc-600 leading-relaxed">Conscientização sobre posse responsável, direitos dos animais e combate total aos maus-tratos.</p>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Blog/News Feed Section */}
+      <section className="py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+            <div>
+              <h2 className="text-3xl md:text-5xl font-black text-zinc-900 mb-4">Acompanhe nosso trabalho</h2>
+              <p className="text-zinc-500 font-medium text-lg">Últimas notícias, resgates e novidades da ONG.</p>
+            </div>
+            <Link 
+              href="/noticias" 
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-zinc-100 text-zinc-900 font-bold hover:bg-brand-blue hover:text-white transition-all"
+            >
+              Ver todas <ArrowRight className="w-5 h-5" />
+            </Link>
+          </div>
+
+          {posts && posts.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {posts.map((post) => {
+                const coverImage = post.coverImage && typeof post.coverImage === 'object' && 'url' in post.coverImage ? post.coverImage.url : '/placeholder-news.jpg';
+                return (
+                  <Link href={`/noticias/${post.id}`} key={post.id} className="group flex flex-col bg-white rounded-3xl overflow-hidden border border-zinc-100 shadow-sm hover:shadow-xl transition-all">
+                    <div className="relative h-60 overflow-hidden bg-zinc-100">
+                      <img 
+                        src={coverImage || '/placeholder-news.jpg'} 
+                        alt={post.title} 
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                      />
+                    </div>
+                    <div className="p-8 flex-1 flex flex-col">
+                      <div className="flex items-center gap-4 text-xs font-bold uppercase tracking-wider text-zinc-400 mb-4">
+                        {post.publishedAt ? new Date(post.publishedAt).toLocaleDateString('pt-BR') : ''}
+                      </div>
+                      <h3 className="text-2xl font-black text-zinc-900 mb-4 group-hover:text-brand-blue transition-colors line-clamp-2">
+                        {post.title}
+                      </h3>
+                      {post.excerpt && (
+                        <p className="text-zinc-600 font-medium line-clamp-3 mb-6 flex-1">
+                          {post.excerpt}
+                        </p>
+                      )}
+                      <div className="mt-auto flex items-center gap-2 text-brand-blue font-black uppercase text-sm tracking-widest">
+                        Ler matéria completa <ArrowRight className="w-4 h-4" />
+                      </div>
+                    </div>
+                  </Link>
+                )
+              })}
+            </div>
+          ) : (
+            <div className="bg-zinc-50 rounded-3xl p-12 text-center border-2 border-dashed border-zinc-200">
+              <BookOpen className="w-16 h-16 text-zinc-300 mx-auto mb-4" />
+              <h3 className="text-2xl font-black text-zinc-900 mb-2">Ainda não temos notícias</h3>
+              <p className="text-zinc-500 font-medium">Em breve compartilharemos nossas histórias aqui.</p>
+            </div>
+          )}
         </div>
       </section>
 
