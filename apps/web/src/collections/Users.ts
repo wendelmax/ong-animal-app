@@ -43,7 +43,7 @@ export const Users: CollectionConfig = {
     {
       name: 'role',
       type: 'select',
-      options: ['Admin', 'Financeiro', 'Veterinário', 'Voluntário', 'Marketing'],
+      options: ['Admin', 'VOLUNTEER_MANAGER', 'COMPLIANCE_OFFICER', 'LEGAL_DIRECTOR', 'Financeiro', 'Veterinário', 'Voluntário', 'Marketing'],
       required: true,
       defaultValue: 'Voluntário',
       access: {
