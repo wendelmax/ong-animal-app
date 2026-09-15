@@ -17,16 +17,23 @@ import { Transactions } from './collections/Transactions'
 import { Volunteers } from './collections/Volunteers'
 import { DocumentTemplates } from './collections/DocumentTemplates'
 import { SignedDocuments } from './collections/SignedDocuments'
+import { VolunteerInvitations } from './collections/VolunteerInvitations'
+import { VolunteerFiles } from './collections/VolunteerFiles'
+import { MembershipTermVersions } from './collections/MembershipTermVersions'
+import { VolunteerTermAcceptances } from './collections/VolunteerTermAcceptances'
+import { AuditEvents } from './collections/AuditEvents'
 import { Pages } from './collections/Pages'
 import { Posts } from './collections/Posts'
 import { Categories } from './collections/Categories'
 import { Header } from './globals/Header'
 import { Footer } from './globals/Footer'
+import { volunteerRegistrationEndpoints } from './endpoints/volunteerRegistration'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
 export default buildConfig({
+  endpoints: volunteerRegistrationEndpoints,
   admin: {
     user: Users.slug,
     importMap: {
@@ -56,6 +63,11 @@ export default buildConfig({
     Volunteers,
     DocumentTemplates,
     SignedDocuments,
+    VolunteerInvitations,
+    VolunteerFiles,
+    MembershipTermVersions,
+    VolunteerTermAcceptances,
+    AuditEvents,
     Pages,
     Posts,
     Categories,
