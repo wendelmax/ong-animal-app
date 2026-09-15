@@ -8,6 +8,14 @@
 4. Criar credencial R2 limitada ao bucket e configurar `R2_ACCOUNT_ID`, `R2_BUCKET_NAME`, `R2_ACCESS_KEY_ID` e `R2_SECRET_ACCESS_KEY`.
 5. Criar Redis Upstash e configurar `UPSTASH_REDIS_REST_URL` e `UPSTASH_REDIS_REST_TOKEN`.
 
+## Desenvolvimento local
+
+O compose em `apps/web/docker-compose.yml` sobe PostgreSQL 15 em `localhost:5432`, banco `ong_animal`, usuário `root` e senha `rootpassword`. Para executar a suíte completa, defina também `PAYLOAD_SECRET`, `VOLUNTEER_CPF_ENCRYPTION_KEY` (32 bytes em Base64), `VOLUNTEER_CPF_HMAC_PEPPER` e `NEXT_PUBLIC_SERVER_URL`, e rode:
+
+`docker compose -f apps/web/docker-compose.yml up -d postgres`
+
+`npm --workspace apps/web run test:int`
+
 ## Segredos
 
 Configurar também `PAYLOAD_SECRET`, `VOLUNTEER_CPF_ENCRYPTION_KEY` (32 bytes em Base64), `VOLUNTEER_CPF_HMAC_PEPPER` e `CRON_SECRET`. Os mesmos nomes devem existir separadamente em Preview e Production; nenhum segredo entra no repositório.
@@ -35,4 +43,3 @@ O plano Hobby possui restrição de uso pessoal/não comercial nos termos da Ver
 - `npm --workspace apps/web exec tsc -- --noEmit`
 - `npm --workspace apps/web run build`
 - `git diff --check`
-

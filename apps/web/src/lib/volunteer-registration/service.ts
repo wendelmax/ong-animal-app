@@ -9,6 +9,18 @@ import { evaluateInvitation, validateVolunteerFile } from './validation'
 
 const ACCEPTANCE_STATEMENT = 'Li e concordo com os termos de adesão e tratamento de dados'
 const publicUrl = (token: string) => `${process.env.NEXT_PUBLIC_SERVER_URL || ''}/voluntarios/cadastro/${token}`
+const LEGACY_FUNCTIONS = ['Resgate', 'Lar Temporário', 'Transporte', 'Eventos', 'Administrativo', 'Marketing'] as const
+
+const legacyFunctionFromInput = (input: any) => {
+  if (LEGACY_FUNCTIONS.includes(input.funcao)) return input.funcao
+  const area = String(input.activityArea || '').toLocaleLowerCase('pt-BR')
+  if (area.includes('admin')) return 'Administrativo'
+  if (area.includes('marketing')) return 'Marketing'
+  if (area.includes('transport')) return 'Transporte'
+  if (area.includes('evento')) return 'Eventos'
+  if (area.includes('lar tempor')) return 'Lar Temporário'
+  return 'Resgate'
+}
 
 export class VolunteerRegistrationError extends Error {
   constructor(public readonly code: string, public readonly status = 400) { super(code) }
@@ -109,7 +121,7 @@ export async function submitRegistration(ctx: PublicContext, rawToken: string, i
   const termResult = await ctx.payload.find({ collection: 'membership-term-versions', where: { id: { equals: input.termVersionId }, status: { equals: 'PUBLISHED' } }, limit: 1, overrideAccess: true })
   const term = termResult.docs?.[0]
   if (!term || term.contentHash !== input.termContentHash) throw new VolunteerRegistrationError('TERM_CHANGED')
-  const volunteer = await ctx.payload.create({ collection: 'volunteers', data: { nome: input.fullName, whatsapp: input.phone, email: input.email, dataNascimento: input.birthDate, rg: input.rg, orgaoEmissor: input.rgIssuer, cpfEncrypted: encryptCpf(cpf), cpfBlindIndex: createCpfBlindIndex(cpf, pepper), cpfMasked: maskCpf(cpf), enderecoRua: input.addressStreet, enderecoBairro: input.addressNeighborhood, cidade: input.addressCity || 'Sumaré', cep: input.addressZipcode, areaAtuacao: input.activityArea, funcaoEspecifica: input.specificRole, dataIngresso: input.admittedAt || nowIso(), horasMediasMes: input.avgHoursPerMonth, sourceInvitation: invitation.id, status: 'PENDING_REVIEW', ativo: false, submittedAt: nowIso() }, overrideAccess: true })
+  const volunteer = await ctx.payload.create({ collection: 'volunteers', data: { nome: input.fullName, whatsapp: input.phone, email: input.email, dataNascimento: input.birthDate, rg: input.rg, orgaoEmissor: input.rgIssuer, cpfEncrypted: encryptCpf(cpf), cpfBlindIndex: createCpfBlindIndex(cpf, pepper), cpfMasked: maskCpf(cpf), enderecoRua: input.addressStreet, enderecoBairro: input.addressNeighborhood, cidade: input.addressCity || 'Sumaré', cep: input.addressZipcode, funcao: legacyFunctionFromInput(input), areaAtuacao: input.activityArea, funcaoEspecifica: input.specificRole, dataIngresso: input.admittedAt || nowIso(), horasMediasMes: input.avgHoursPerMonth, sourceInvitation: invitation.id, status: 'PENDING_REVIEW', ativo: false, submittedAt: nowIso() }, overrideAccess: true })
   for (const file of files.docs) await ctx.payload.update({ collection: 'volunteer-files', id: file.id, data: { volunteer: volunteer.id }, overrideAccess: true })
   await ctx.payload.create({ collection: 'volunteer-term-acceptances', data: { volunteer: volunteer.id, termVersion: term.id, acceptedAt: nowIso(), ipAddress: ctx.ipAddress, userAgent: ctx.userAgent, contentHashAtAcceptance: term.contentHash, statement: ACCEPTANCE_STATEMENT }, overrideAccess: true })
   await ctx.payload.update({ collection: 'volunteer-invitations', id: invitation.id, data: { usedCount: invitation.usedCount + 1, status: invitation.usedCount + 1 >= invitation.maxUses ? 'EXHAUSTED' : 'ACTIVE', lastUsedAt: nowIso() }, overrideAccess: true })
@@ -136,4 +148,3 @@ export async function createFileDownload(ctx: RequestContext, volunteerId: strin
 }
 
 export { ACCEPTANCE_STATEMENT }
-
