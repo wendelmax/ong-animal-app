@@ -6,7 +6,7 @@ const allowed = ({ req: { user } }: any) => canManageVolunteerInvitations(user)
 export const VolunteerInvitations: CollectionConfig = {
   slug: 'volunteer-invitations',
   labels: { singular: 'Convite de voluntário', plural: 'Convites de voluntários' },
-  admin: { useAsTitle: 'status', group: 'Pessoas', description: 'Links públicos para cadastro de voluntários' },
+  admin: { useAsTitle: 'status', group: 'Pessoas', description: 'Links públicos para cadastro de voluntários', components: { beforeList: ['/components/Admin/VolunteerInvitationActions'] } },
   access: {
     read: allowed,
     create: allowed,
@@ -23,4 +23,3 @@ export const VolunteerInvitations: CollectionConfig = {
     { name: 'lastUsedAt', type: 'date', admin: { readOnly: true } },
   ],
 }
-

@@ -10,6 +10,7 @@ export const Volunteers: CollectionConfig = {
     useAsTitle: 'nome',
     description: 'Cadastro de voluntários da ONG',
     group: 'Pessoas',
+    components: { beforeList: ['/components/Admin/VolunteerInvitationActions'] },
   },
   access: {
     read: ({ req: { user } }) => Boolean(user?.role === 'Admin'),
