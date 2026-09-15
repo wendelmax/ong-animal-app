@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { canReadVolunteerContact, canReviewVolunteer, canDownloadVolunteerFile } from '../lib/volunteer-registration/access'
 
 export const Volunteers: CollectionConfig = {
   slug: 'volunteers',
@@ -13,9 +14,9 @@ export const Volunteers: CollectionConfig = {
     components: { beforeList: ['/components/Admin/VolunteerInvitationActions'] },
   },
   access: {
-    read: ({ req: { user } }) => Boolean(user?.role === 'Admin'),
+    read: ({ req: { user } }) => canReadVolunteerContact(user),
     create: ({ req: { user } }) => Boolean(user?.role === 'Admin'),
-    update: ({ req: { user } }) => Boolean(user?.role === 'Admin'),
+    update: ({ req: { user } }) => canReviewVolunteer(user),
     delete: ({ req: { user } }) => Boolean(user?.role === 'Admin'),
   },
   fields: [
@@ -82,10 +83,10 @@ export const Volunteers: CollectionConfig = {
       defaultValue: true,
     },
     { name: 'dataNascimento', type: 'date', label: 'Data de nascimento', admin: { date: { pickerAppearance: 'dayOnly' } } },
-    { name: 'rg', type: 'text', label: 'RG' },
-    { name: 'orgaoEmissor', type: 'text', label: 'Órgão emissor' },
-    { name: 'cpfEncrypted', type: 'text', admin: { hidden: true, readOnly: true } },
-    { name: 'cpfBlindIndex', type: 'text', admin: { hidden: true, readOnly: true } },
+    { name: 'rg', type: 'text', label: 'RG', access: { read: ({ req: { user } }) => canDownloadVolunteerFile(user) } },
+    { name: 'orgaoEmissor', type: 'text', label: 'Órgão emissor', access: { read: ({ req: { user } }) => canDownloadVolunteerFile(user) } },
+    { name: 'cpfEncrypted', type: 'text', access: { read: ({ req: { user } }) => canDownloadVolunteerFile(user) }, admin: { hidden: true, readOnly: true } },
+    { name: 'cpfBlindIndex', type: 'text', access: { read: ({ req: { user } }) => canDownloadVolunteerFile(user) }, admin: { hidden: true, readOnly: true } },
     { name: 'cpfMasked', type: 'text', label: 'CPF', admin: { readOnly: true } },
     { name: 'email', type: 'email', label: 'E-mail' },
     { name: 'enderecoRua', type: 'text', label: 'Rua' },
