@@ -77,6 +77,11 @@ export interface Config {
     volunteers: Volunteer;
     'document-templates': DocumentTemplate;
     'signed-documents': SignedDocument;
+    'volunteer-invitations': VolunteerInvitation;
+    'volunteer-files': VolunteerFile;
+    'membership-term-versions': MembershipTermVersion;
+    'volunteer-term-acceptances': VolunteerTermAcceptance;
+    'audit-events': AuditEvent;
     pages: Page;
     posts: Post;
     categories: Category;
@@ -97,6 +102,11 @@ export interface Config {
     volunteers: VolunteersSelect<false> | VolunteersSelect<true>;
     'document-templates': DocumentTemplatesSelect<false> | DocumentTemplatesSelect<true>;
     'signed-documents': SignedDocumentsSelect<false> | SignedDocumentsSelect<true>;
+    'volunteer-invitations': VolunteerInvitationsSelect<false> | VolunteerInvitationsSelect<true>;
+    'volunteer-files': VolunteerFilesSelect<false> | VolunteerFilesSelect<true>;
+    'membership-term-versions': MembershipTermVersionsSelect<false> | MembershipTermVersionsSelect<true>;
+    'volunteer-term-acceptances': VolunteerTermAcceptancesSelect<false> | VolunteerTermAcceptancesSelect<true>;
+    'audit-events': AuditEventsSelect<false> | AuditEventsSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
@@ -152,7 +162,15 @@ export interface UserAuthOperations {
 export interface User {
   id: number;
   name: string;
-  role: 'Admin' | 'Financeiro' | 'Veterinário' | 'Voluntário' | 'Marketing';
+  role:
+    | 'Admin'
+    | 'VOLUNTEER_MANAGER'
+    | 'COMPLIANCE_OFFICER'
+    | 'LEGAL_DIRECTOR'
+    | 'Financeiro'
+    | 'Veterinário'
+    | 'Voluntário'
+    | 'Marketing';
   /**
    * Qual organização este usuário pertence (White Label).
    */
@@ -354,6 +372,7 @@ export interface Transaction {
  */
 export interface Volunteer {
   id: number;
+  status: 'PENDING_REVIEW' | 'ACTIVE' | 'REJECTED' | 'RESIGNED' | 'SUSPENDED';
   nome: string;
   whatsapp: string;
   isLT?: boolean | null;
@@ -363,6 +382,43 @@ export interface Volunteer {
   funcao: 'Resgate' | 'Lar Temporário' | 'Transporte' | 'Eventos' | 'Administrativo' | 'Marketing';
   disponibilidade?: string | null;
   ativo?: boolean | null;
+  dataNascimento?: string | null;
+  rg?: string | null;
+  orgaoEmissor?: string | null;
+  cpfEncrypted?: string | null;
+  cpfBlindIndex?: string | null;
+  cpfMasked?: string | null;
+  email?: string | null;
+  enderecoRua?: string | null;
+  enderecoBairro?: string | null;
+  cep?: string | null;
+  areaAtuacao?: string | null;
+  funcaoEspecifica?: string | null;
+  dataIngresso?: string | null;
+  horasMediasMes?: number | null;
+  sourceInvitation?: (number | null) | VolunteerInvitation;
+  submittedAt?: string | null;
+  reviewedAt?: string | null;
+  reviewedBy?: (number | null) | User;
+  rejectionReason?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Links públicos para cadastro de voluntários
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "volunteer-invitations".
+ */
+export interface VolunteerInvitation {
+  id: number;
+  tokenHash?: string | null;
+  createdBy: number | User;
+  expiresAt: string;
+  maxUses: number;
+  usedCount: number;
+  status: 'ACTIVE' | 'EXPIRED' | 'EXHAUSTED' | 'REVOKED';
+  lastUsedAt?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -413,6 +469,89 @@ export interface SignedDocument {
   signatureIp?: string | null;
   status: 'Assinado' | 'Revogado';
   generatedPdf?: (number | null) | Media;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "volunteer-files".
+ */
+export interface VolunteerFile {
+  id: number;
+  volunteer?: (number | null) | Volunteer;
+  invitation: number | VolunteerInvitation;
+  submissionId: string;
+  purpose: 'PERSONAL_PHOTO' | 'IDENTITY_DOCUMENT';
+  storageProvider: 'R2';
+  objectKey: string;
+  mimeType: string;
+  sizeBytes: number;
+  sha256: string;
+  uploadStatus: 'PENDING' | 'UPLOADED' | 'REJECTED' | 'DELETED';
+  uploadedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "membership-term-versions".
+ */
+export interface MembershipTermVersion {
+  id: number;
+  version: string;
+  content: string;
+  contentHash: string;
+  documentKey?: string | null;
+  effectiveFrom: string;
+  effectiveUntil?: string | null;
+  status: 'DRAFT' | 'PUBLISHED' | 'RETIRED';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "volunteer-term-acceptances".
+ */
+export interface VolunteerTermAcceptance {
+  id: number;
+  volunteer: number | Volunteer;
+  termVersion: number | MembershipTermVersion;
+  acceptedAt: string;
+  ipAddress: string;
+  userAgent: string;
+  contentHashAtAcceptance: string;
+  statement: string;
+  signedDocument?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "audit-events".
+ */
+export interface AuditEvent {
+  id: number;
+  eventType: string;
+  occurredAt: string;
+  actorType: 'ADMIN' | 'PUBLIC_INVITATION' | 'SYSTEM';
+  actorId?: string | null;
+  actorRole?: string | null;
+  targetType: string;
+  targetId: string;
+  ipAddress?: string | null;
+  userAgent?: string | null;
+  metadata?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  legalGround?: string | null;
+  targetNorm?: string | null;
+  targetEntity?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -555,6 +694,26 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'signed-documents';
         value: number | SignedDocument;
+      } | null)
+    | ({
+        relationTo: 'volunteer-invitations';
+        value: number | VolunteerInvitation;
+      } | null)
+    | ({
+        relationTo: 'volunteer-files';
+        value: number | VolunteerFile;
+      } | null)
+    | ({
+        relationTo: 'membership-term-versions';
+        value: number | MembershipTermVersion;
+      } | null)
+    | ({
+        relationTo: 'volunteer-term-acceptances';
+        value: number | VolunteerTermAcceptance;
+      } | null)
+    | ({
+        relationTo: 'audit-events';
+        value: number | AuditEvent;
       } | null)
     | ({
         relationTo: 'pages';
@@ -761,6 +920,7 @@ export interface TransactionsSelect<T extends boolean = true> {
  * via the `definition` "volunteers_select".
  */
 export interface VolunteersSelect<T extends boolean = true> {
+  status?: T;
   nome?: T;
   whatsapp?: T;
   isLT?: T;
@@ -770,6 +930,25 @@ export interface VolunteersSelect<T extends boolean = true> {
   funcao?: T;
   disponibilidade?: T;
   ativo?: T;
+  dataNascimento?: T;
+  rg?: T;
+  orgaoEmissor?: T;
+  cpfEncrypted?: T;
+  cpfBlindIndex?: T;
+  cpfMasked?: T;
+  email?: T;
+  enderecoRua?: T;
+  enderecoBairro?: T;
+  cep?: T;
+  areaAtuacao?: T;
+  funcaoEspecifica?: T;
+  dataIngresso?: T;
+  horasMediasMes?: T;
+  sourceInvitation?: T;
+  submittedAt?: T;
+  reviewedAt?: T;
+  reviewedBy?: T;
+  rejectionReason?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -797,6 +976,92 @@ export interface SignedDocumentsSelect<T extends boolean = true> {
   signatureIp?: T;
   status?: T;
   generatedPdf?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "volunteer-invitations_select".
+ */
+export interface VolunteerInvitationsSelect<T extends boolean = true> {
+  tokenHash?: T;
+  createdBy?: T;
+  expiresAt?: T;
+  maxUses?: T;
+  usedCount?: T;
+  status?: T;
+  lastUsedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "volunteer-files_select".
+ */
+export interface VolunteerFilesSelect<T extends boolean = true> {
+  volunteer?: T;
+  invitation?: T;
+  submissionId?: T;
+  purpose?: T;
+  storageProvider?: T;
+  objectKey?: T;
+  mimeType?: T;
+  sizeBytes?: T;
+  sha256?: T;
+  uploadStatus?: T;
+  uploadedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "membership-term-versions_select".
+ */
+export interface MembershipTermVersionsSelect<T extends boolean = true> {
+  version?: T;
+  content?: T;
+  contentHash?: T;
+  documentKey?: T;
+  effectiveFrom?: T;
+  effectiveUntil?: T;
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "volunteer-term-acceptances_select".
+ */
+export interface VolunteerTermAcceptancesSelect<T extends boolean = true> {
+  volunteer?: T;
+  termVersion?: T;
+  acceptedAt?: T;
+  ipAddress?: T;
+  userAgent?: T;
+  contentHashAtAcceptance?: T;
+  statement?: T;
+  signedDocument?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "audit-events_select".
+ */
+export interface AuditEventsSelect<T extends boolean = true> {
+  eventType?: T;
+  occurredAt?: T;
+  actorType?: T;
+  actorId?: T;
+  actorRole?: T;
+  targetType?: T;
+  targetId?: T;
+  ipAddress?: T;
+  userAgent?: T;
+  metadata?: T;
+  legalGround?: T;
+  targetNorm?: T;
+  targetEntity?: T;
   updatedAt?: T;
   createdAt?: T;
 }

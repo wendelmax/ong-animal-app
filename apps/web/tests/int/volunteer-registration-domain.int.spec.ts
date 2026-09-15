@@ -71,7 +71,7 @@ describe('volunteer registration domain primitives', () => {
       evaluateInvitation({
         status: overrides.status as InvitationStatus,
         expiresAt: overrides.expiresAt,
-        usedCount: overrides.usedCount ?? 0,
+        usedCount: 'usedCount' in overrides ? overrides.usedCount : 0,
         maxUses: 1,
         now: new Date('2026-09-15T12:00:00.000Z'),
       }),

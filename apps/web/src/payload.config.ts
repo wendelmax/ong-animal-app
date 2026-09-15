@@ -17,6 +17,11 @@ import { Transactions } from './collections/Transactions'
 import { Volunteers } from './collections/Volunteers'
 import { DocumentTemplates } from './collections/DocumentTemplates'
 import { SignedDocuments } from './collections/SignedDocuments'
+import { VolunteerInvitations } from './collections/VolunteerInvitations'
+import { VolunteerFiles } from './collections/VolunteerFiles'
+import { MembershipTermVersions } from './collections/MembershipTermVersions'
+import { VolunteerTermAcceptances } from './collections/VolunteerTermAcceptances'
+import { AuditEvents } from './collections/AuditEvents'
 import { Pages } from './collections/Pages'
 import { Posts } from './collections/Posts'
 import { Categories } from './collections/Categories'
@@ -56,6 +61,11 @@ export default buildConfig({
     Volunteers,
     DocumentTemplates,
     SignedDocuments,
+    VolunteerInvitations,
+    VolunteerFiles,
+    MembershipTermVersions,
+    VolunteerTermAcceptances,
+    AuditEvents,
     Pages,
     Posts,
     Categories,
