@@ -2,8 +2,8 @@ import { DeleteObjectCommand, GetObjectCommand, HeadObjectCommand, PutObjectComm
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 
 export type R2StoragePort = {
-  createUploadUrl(input: { objectKey: string; contentType: string; maxSizeBytes: number }): Promise<{ url: string; expiresAt: string }>
-  headObject(objectKey: string): Promise<{ exists: boolean; sizeBytes?: number; contentType?: string; etag?: string }>
+  createUploadUrl(input: { objectKey: string; contentType: string; maxSizeBytes: number; sha256: string }): Promise<{ url: string; expiresAt: string; headers: Record<string, string> }>
+  headObject(objectKey: string): Promise<{ exists: boolean; sizeBytes?: number; contentType?: string; etag?: string; sha256?: string }>
   createDownloadUrl(objectKey: string): Promise<{ url: string; expiresAt: string }>
   deleteObject(objectKey: string): Promise<void>
 }
@@ -27,15 +27,16 @@ const bucket = () => process.env.R2_BUCKET_NAME || (() => { throw new Error('R2_
 const expiresAt = (seconds: number) => new Date(Date.now() + seconds * 1000).toISOString()
 
 export const r2Storage: R2StoragePort = {
-  async createUploadUrl({ objectKey, contentType }) {
+  async createUploadUrl({ objectKey, contentType, maxSizeBytes, sha256 }) {
     const expiry = expiresAt(uploadExpirySeconds)
-    const command = new PutObjectCommand({ Bucket: bucket(), Key: objectKey, ContentType: contentType })
-    return { url: await getSignedUrl(getClient(), command, { expiresIn: uploadExpirySeconds }), expiresAt: expiry }
+    const headers = { 'Content-Type': contentType, 'x-amz-meta-sha256': sha256 }
+    const command = new PutObjectCommand({ Bucket: bucket(), Key: objectKey, ContentType: contentType, ContentLength: maxSizeBytes, Metadata: { sha256 } })
+    return { url: await getSignedUrl(getClient(), command, { expiresIn: uploadExpirySeconds }), expiresAt: expiry, headers }
   },
   async headObject(objectKey) {
     try {
       const result = await getClient().send(new HeadObjectCommand({ Bucket: bucket(), Key: objectKey }))
-      return { exists: true, sizeBytes: result.ContentLength, contentType: result.ContentType, etag: result.ETag }
+      return { exists: true, sizeBytes: result.ContentLength, contentType: result.ContentType, etag: result.ETag, sha256: result.Metadata?.sha256 }
     } catch (error: any) {
       if (error?.$metadata?.httpStatusCode === 404 || error?.name === 'NotFound') return { exists: false }
       throw error

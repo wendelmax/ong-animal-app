@@ -4,6 +4,9 @@ import {
   canDownloadVolunteerFile,
   canManageVolunteerInvitations,
   canReadVolunteerContact,
+  canReadVolunteerPrivateData,
+  canReadVolunteerCpf,
+  canUpdateVolunteerProtectedFields,
   canReviewVolunteer,
 } from '@/lib/volunteer-registration/access'
 
@@ -29,5 +32,14 @@ describe('volunteer collection access', () => {
     }
     expect(canReadVolunteerContact(null)).toBe(false)
     expect(canReviewVolunteer(undefined)).toBe(false)
+  })
+
+  it('separa PII privada, CPF e campos protegidos do gerente operacional', () => {
+    expect(canReadVolunteerPrivateData({ role: 'VOLUNTEER_MANAGER' })).toBe(false)
+    expect(canReadVolunteerPrivateData({ role: 'COMPLIANCE_OFFICER' })).toBe(true)
+    expect(canReadVolunteerCpf({ role: 'VOLUNTEER_MANAGER' })).toBe(false)
+    expect(canReadVolunteerCpf({ role: 'LEGAL_DIRECTOR' })).toBe(true)
+    expect(canUpdateVolunteerProtectedFields({ role: 'VOLUNTEER_MANAGER' })).toBe(false)
+    expect(canUpdateVolunteerProtectedFields({ role: 'COMPLIANCE_OFFICER' })).toBe(true)
   })
 })

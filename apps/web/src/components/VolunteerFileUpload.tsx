@@ -19,7 +19,7 @@ export function VolunteerFileUpload({ label, purpose, token, submissionId, onUpl
     const intentResponse = await fetch(`/api/volunteer-invitations/${token}/uploads`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ submissionId, purpose, mimeType: file.type, sizeBytes: file.size, sha256 }) })
     if (!intentResponse.ok) { setState('Arquivo recusado. Confira formato e tamanho.'); return }
     const intent = await intentResponse.json()
-    const uploadResponse = await fetch(intent.url, { method: 'PUT', headers: { 'Content-Type': file.type }, body: file })
+    const uploadResponse = await fetch(intent.url, { method: 'PUT', headers: intent.headers || { 'Content-Type': file.type }, body: file })
     if (!uploadResponse.ok) { setState('Não foi possível enviar o arquivo.'); return }
     const confirmResponse = await fetch(`/api/volunteer-invitations/${token}/uploads/confirm`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fileId: intent.fileId }) })
     if (!confirmResponse.ok) { setState('Não foi possível confirmar o arquivo.'); return }

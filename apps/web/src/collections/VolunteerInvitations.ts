@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload'
 import { canManageVolunteerInvitations } from '../lib/volunteer-registration/access'
 
 const allowed = ({ req: { user } }: any) => canManageVolunteerInvitations(user)
+const safeUpdate = ({ req: { user }, data }: any) => canManageVolunteerInvitations(user) && Object.keys(data || {}).every((key) => key === 'status')
 
 export const VolunteerInvitations: CollectionConfig = {
   slug: 'volunteer-invitations',
@@ -10,7 +11,7 @@ export const VolunteerInvitations: CollectionConfig = {
   access: {
     read: allowed,
     create: allowed,
-    update: allowed,
+    update: safeUpdate,
     delete: ({ req: { user } }) => user?.role === 'Admin',
   },
   fields: [

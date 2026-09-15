@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { normalizeCpf, maskCpf, createCpfBlindIndex } from '@/lib/volunteer-registration/cpf'
-import { evaluateInvitation } from '@/lib/volunteer-registration/validation'
+import { evaluateInvitation, isTermCurrentlyEffective } from '@/lib/volunteer-registration/validation'
 import { validateVolunteerFile } from '@/lib/volunteer-registration/validation'
 import { createInvitationSecret } from '@/lib/volunteer-registration/tokens'
 import type { FilePurpose, InvitationStatus } from '@/lib/volunteer-registration/types'
@@ -103,5 +103,11 @@ describe('volunteer registration domain primitives', () => {
         sha256: 'a'.repeat(64),
       }),
     ).toEqual({ valid: false, error: 'WRONG_PURPOSE' })
+  })
+
+  it('considera somente o termo publicado dentro da janela de vigência', () => {
+    expect(isTermCurrentlyEffective({ status: 'PUBLISHED', effectiveFrom: '2026-09-15T11:00:00.000Z', effectiveUntil: '2026-09-15T13:00:00.000Z' }, new Date('2026-09-15T12:00:00.000Z'))).toBe(true)
+    expect(isTermCurrentlyEffective({ status: 'PUBLISHED', effectiveFrom: '2026-09-15T11:00:00.000Z', effectiveUntil: '2026-09-15T11:59:59.000Z' }, new Date('2026-09-15T12:00:00.000Z'))).toBe(false)
+    expect(isTermCurrentlyEffective({ status: 'DRAFT', effectiveFrom: '2026-09-15T11:00:00.000Z' }, new Date('2026-09-15T12:00:00.000Z'))).toBe(false)
   })
 })

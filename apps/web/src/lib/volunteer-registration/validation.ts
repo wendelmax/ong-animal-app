@@ -11,6 +11,12 @@ const ALLOWED_MIME_TYPES: Record<FilePurpose, readonly string[]> = {
   IDENTITY_DOCUMENT: ['image/jpeg', 'image/png', 'application/pdf'],
 }
 
+export function isTermCurrentlyEffective(term: { status?: string; effectiveFrom: string; effectiveUntil?: string | null }, now = new Date()): boolean {
+  const startsAt = new Date(term.effectiveFrom).getTime()
+  const endsAt = term.effectiveUntil ? new Date(term.effectiveUntil).getTime() : Number.POSITIVE_INFINITY
+  return term.status === 'PUBLISHED' && startsAt <= now.getTime() && now.getTime() < endsAt
+}
+
 export function evaluateInvitation(input: {
   status: InvitationStatus
   expiresAt: string

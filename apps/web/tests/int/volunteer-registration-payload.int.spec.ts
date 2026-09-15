@@ -23,11 +23,11 @@ describeWithDatabase('volunteer registration with Payload and PostgreSQL', () =>
   let invitationId: string
   let volunteerId: string
 
-  const objectMetadata = new Map<string, { sizeBytes: number; contentType: string }>()
+  const objectMetadata = new Map<string, { sizeBytes: number; contentType: string; sha256: string }>()
   const r2: R2StoragePort = {
-    async createUploadUrl({ objectKey, contentType, maxSizeBytes }) {
-      objectMetadata.set(objectKey, { sizeBytes: maxSizeBytes, contentType })
-      return { url: `https://storage.test/${encodeURIComponent(objectKey)}`, expiresAt: new Date(Date.now() + 900_000).toISOString() }
+    async createUploadUrl({ objectKey, contentType, maxSizeBytes, sha256 }) {
+      objectMetadata.set(objectKey, { sizeBytes: maxSizeBytes, contentType, sha256 })
+      return { url: `https://storage.test/${encodeURIComponent(objectKey)}`, expiresAt: new Date(Date.now() + 900_000).toISOString(), headers: { 'Content-Type': contentType, 'x-amz-meta-sha256': sha256 } }
     },
     async headObject(objectKey) {
       const metadata = objectMetadata.get(objectKey)
@@ -81,7 +81,7 @@ describeWithDatabase('volunteer registration with Payload and PostgreSQL', () =>
     const invitation = await createInvitation(adminContext, { expiresAt: new Date(Date.now() + 3_600_000).toISOString() })
     const token = invitation.url.split('/').at(-1)!
 
-    const publicContext = { payload, ipAddress: '203.0.113.10', userAgent: 'integration-test/1.0', r2 }
+    const publicContext = { payload, req: { payload }, ipAddress: '203.0.113.10', userAgent: 'integration-test/1.0', r2 }
     const publicInvitation = await getPublicInvitation(publicContext, token)
     invitationId = publicInvitation.invitationId
 
@@ -133,5 +133,6 @@ describeWithDatabase('volunteer registration with Payload and PostgreSQL', () =>
     expect(storedFiles.docs.map((file: any) => file.id).sort()).toEqual(files.map((file) => file.fileId).sort())
     expect(audit.docs.some((event: any) => event.eventType === 'VOLUNTEER_SUBMITTED')).toBe(true)
     expect(storedInvitation.status).toBe('EXHAUSTED')
+    await expect(submitRegistration(publicContext, token, { submissionId: publicInvitation.submissionId, termVersionId: publicInvitation.term.id, termContentHash: publicInvitation.term.contentHash, statement: ACCEPTANCE_STATEMENT })).rejects.toMatchObject({ code: 'INVITATION_INVALID' })
   })
 })

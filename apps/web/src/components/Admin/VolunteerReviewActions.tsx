@@ -1,11 +1,15 @@
 'use client'
 
 import { useState } from 'react'
+import { useDocumentInfo } from '@payloadcms/ui'
 
-export function VolunteerReviewActions({ volunteerId }: { volunteerId: string }) {
+export function VolunteerReviewActions({ volunteerId: explicitVolunteerId }: { volunteerId?: string } = {}) {
+  const { id } = useDocumentInfo()
+  const volunteerId = explicitVolunteerId || (id ? String(id) : '')
   const [reason, setReason] = useState('')
   const [message, setMessage] = useState('')
   const review = async (decision: 'APPROVE' | 'REJECT') => {
+    if (!volunteerId) return
     if (decision === 'REJECT' && !reason.trim()) { setMessage('Informe o motivo da rejeição.'); return }
     const response = await fetch(`/api/volunteers/${volunteerId}/review`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ decision, rejectionReason: reason }) })
     setMessage(response.ok ? 'Revisão salva.' : 'Não foi possível salvar a revisão.')

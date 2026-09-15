@@ -1,5 +1,9 @@
 import type { CollectionConfig } from 'payload'
-import { canReadVolunteerContact, canReviewVolunteer, canDownloadVolunteerFile } from '../lib/volunteer-registration/access'
+import { canReadVolunteerContact, canReadVolunteerCpf, canReadVolunteerPrivateData, canReviewVolunteer } from '../lib/volunteer-registration/access'
+
+const noDirectUpdate = { update: () => false }
+const privateRead = { read: ({ req: { user } }: any) => canReadVolunteerPrivateData(user) }
+const cpfRead = { read: ({ req: { user } }: any) => canReadVolunteerCpf(user) }
 
 export const Volunteers: CollectionConfig = {
   slug: 'volunteers',
@@ -11,7 +15,7 @@ export const Volunteers: CollectionConfig = {
     useAsTitle: 'nome',
     description: 'Cadastro de voluntários da ONG',
     group: 'Pessoas',
-    components: { beforeList: ['/components/Admin/VolunteerInvitationActions'] },
+    components: { beforeList: ['/components/Admin/VolunteerInvitationActions'], edit: { beforeDocumentControls: ['/components/Admin/VolunteerReviewActions'] } },
   },
   access: {
     read: ({ req: { user } }) => canReadVolunteerContact(user),
@@ -27,6 +31,7 @@ export const Volunteers: CollectionConfig = {
       options: ['PENDING_REVIEW', 'ACTIVE', 'REJECTED', 'RESIGNED', 'SUSPENDED'],
       defaultValue: 'ACTIVE',
       required: true,
+      access: noDirectUpdate,
     },
     {
       name: 'nome',
@@ -57,12 +62,14 @@ export const Volunteers: CollectionConfig = {
       name: 'endereco',
       type: 'textarea',
       label: 'Endereço Completo',
+      access: { ...privateRead, ...noDirectUpdate },
     },
     {
       name: 'cidade',
       type: 'text',
       label: 'Cidade',
       defaultValue: 'Sumaré',
+      access: { ...privateRead, ...noDirectUpdate },
     },
     {
       name: 'funcao',
@@ -81,25 +88,26 @@ export const Volunteers: CollectionConfig = {
       type: 'checkbox',
       label: 'Voluntário Ativo',
       defaultValue: true,
+      access: noDirectUpdate,
     },
-    { name: 'dataNascimento', type: 'date', label: 'Data de nascimento', admin: { date: { pickerAppearance: 'dayOnly' } } },
-    { name: 'rg', type: 'text', label: 'RG', access: { read: ({ req: { user } }) => canDownloadVolunteerFile(user) } },
-    { name: 'orgaoEmissor', type: 'text', label: 'Órgão emissor', access: { read: ({ req: { user } }) => canDownloadVolunteerFile(user) } },
-    { name: 'cpfEncrypted', type: 'text', access: { read: ({ req: { user } }) => canDownloadVolunteerFile(user) }, admin: { hidden: true, readOnly: true } },
-    { name: 'cpfBlindIndex', type: 'text', access: { read: ({ req: { user } }) => canDownloadVolunteerFile(user) }, admin: { hidden: true, readOnly: true } },
-    { name: 'cpfMasked', type: 'text', label: 'CPF', admin: { readOnly: true } },
+    { name: 'dataNascimento', type: 'date', label: 'Data de nascimento', access: { ...privateRead, ...noDirectUpdate }, admin: { date: { pickerAppearance: 'dayOnly' } } },
+    { name: 'rg', type: 'text', label: 'RG', access: { ...privateRead, ...noDirectUpdate } },
+    { name: 'orgaoEmissor', type: 'text', label: 'Órgão emissor', access: { ...privateRead, ...noDirectUpdate } },
+    { name: 'cpfEncrypted', type: 'text', access: { ...cpfRead, ...noDirectUpdate }, admin: { hidden: true, readOnly: true } },
+    { name: 'cpfBlindIndex', type: 'text', access: { ...cpfRead, ...noDirectUpdate }, admin: { hidden: true, readOnly: true } },
+    { name: 'cpfMasked', type: 'text', label: 'CPF', access: noDirectUpdate, admin: { readOnly: true } },
     { name: 'email', type: 'email', label: 'E-mail' },
-    { name: 'enderecoRua', type: 'text', label: 'Rua' },
-    { name: 'enderecoBairro', type: 'text', label: 'Bairro' },
-    { name: 'cep', type: 'text', label: 'CEP' },
+    { name: 'enderecoRua', type: 'text', label: 'Rua', access: { ...privateRead, ...noDirectUpdate } },
+    { name: 'enderecoBairro', type: 'text', label: 'Bairro', access: { ...privateRead, ...noDirectUpdate } },
+    { name: 'cep', type: 'text', label: 'CEP', access: { ...privateRead, ...noDirectUpdate } },
     { name: 'areaAtuacao', type: 'text', label: 'Área de atuação' },
     { name: 'funcaoEspecifica', type: 'text', label: 'Função específica' },
-    { name: 'dataIngresso', type: 'date', label: 'Data de ingresso' },
-    { name: 'horasMediasMes', type: 'number', label: 'Horas médias por mês' },
-    { name: 'sourceInvitation', type: 'relationship', relationTo: 'volunteer-invitations', admin: { readOnly: true } },
-    { name: 'submittedAt', type: 'date', admin: { readOnly: true } },
-    { name: 'reviewedAt', type: 'date', admin: { readOnly: true } },
-    { name: 'reviewedBy', type: 'relationship', relationTo: 'users', admin: { readOnly: true } },
-    { name: 'rejectionReason', type: 'textarea', admin: { readOnly: true } },
+    { name: 'dataIngresso', type: 'date', label: 'Data de ingresso', access: noDirectUpdate },
+    { name: 'horasMediasMes', type: 'number', label: 'Horas médias por mês', access: noDirectUpdate },
+    { name: 'sourceInvitation', type: 'relationship', relationTo: 'volunteer-invitations', access: noDirectUpdate, admin: { readOnly: true } },
+    { name: 'submittedAt', type: 'date', access: noDirectUpdate, admin: { readOnly: true } },
+    { name: 'reviewedAt', type: 'date', access: noDirectUpdate, admin: { readOnly: true } },
+    { name: 'reviewedBy', type: 'relationship', relationTo: 'users', access: noDirectUpdate, admin: { readOnly: true } },
+    { name: 'rejectionReason', type: 'textarea', access: noDirectUpdate, admin: { readOnly: true } },
   ],
 }
