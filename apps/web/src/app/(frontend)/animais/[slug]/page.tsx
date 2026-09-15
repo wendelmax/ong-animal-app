@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { RichText } from '@payloadcms/richtext-lexical/react'
+import { ShareButton } from '@/components/ShareButton'
 
 interface PageProps {
   params: Promise<{
@@ -193,11 +194,10 @@ export default async function AnimalDetailPage({ params }: PageProps) {
               {/* Share Card */}
               <div className="bg-zinc-50 rounded-[2rem] p-8 border border-zinc-100">
                 <h4 className="text-sm font-black text-zinc-400 uppercase tracking-widest mb-6">Ajude divulgando</h4>
-                <div className="flex gap-4">
-                  <button className="flex-1 py-4 bg-white border border-zinc-200 rounded-xl flex items-center justify-center gap-2 font-black text-brand-blue hover:border-brand-blue transition-all">
-                    <Share2 className="w-5 h-5" /> Compartilhar
-                  </button>
-                </div>
+                <ShareButton
+                  title={`Adote o(a) ${animal.nome} | Viralatinhas Sumaré`}
+                  text={`Conheça o(a) ${animal.nome}, disponível para adoção responsável na Viralatinhas Sumaré!`}
+                />
               </div>
             </div>
           </div>

@@ -118,8 +118,9 @@ export default async function HomePage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {posts.map((post) => {
                 const coverImage = post.coverImage && typeof post.coverImage === 'object' && 'url' in post.coverImage ? post.coverImage.url : '/placeholder-news.jpg';
+                const postSlug = (post as any).slug || post.id;
                 return (
-                  <Link href={`/noticias/${post.id}`} key={post.id} className="group flex flex-col bg-white rounded-3xl overflow-hidden border border-zinc-100 shadow-sm hover:shadow-xl transition-all">
+                  <Link href={`/noticias/${postSlug}`} key={post.id} className="group flex flex-col bg-white rounded-3xl overflow-hidden border border-zinc-100 shadow-sm hover:shadow-xl transition-all">
                     <div className="relative h-60 overflow-hidden bg-zinc-100">
                       <img 
                         src={coverImage || '/placeholder-news.jpg'} 

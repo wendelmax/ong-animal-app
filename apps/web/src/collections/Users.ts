@@ -5,6 +5,16 @@ const isAdmin = ({ req: { user } }: { req: { user: User | null | any } }) => {
   return Boolean(user?.role === 'Admin')
 }
 
+const isAdminOrSelf = ({ req: { user } }: { req: { user: User | null | any } }) => {
+  if (!user) return false
+  if (user.role === 'Admin') return true
+  return {
+    id: {
+      equals: user.id,
+    },
+  }
+}
+
 export const Users: CollectionConfig = {
   slug: 'users',
   labels: {
@@ -14,14 +24,15 @@ export const Users: CollectionConfig = {
   admin: {
     useAsTitle: 'email',
     group: 'Administração',
+    defaultColumns: ['name', 'email', 'role'],
   },
   auth: true,
   access: {
-    read: isAdmin,
+    read: isAdminOrSelf,
     create: isAdmin,
-    update: isAdmin,
+    update: isAdminOrSelf,
     delete: isAdmin,
-    admin: () => true, // Allows login to admin panel. Can be refined later based on roles.
+    admin: () => true, // Permite acesso ao painel para roles cadastrados
   },
   fields: [
     {
@@ -36,7 +47,7 @@ export const Users: CollectionConfig = {
       required: true,
       defaultValue: 'Voluntário',
       access: {
-        update: isAdmin, // only admins can change roles
+        update: isAdmin, // Apenas administradores podem alterar o nível de permissão
       },
     },
     {

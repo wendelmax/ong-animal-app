@@ -7,7 +7,16 @@ export const AnimalEvents: CollectionConfig = {
     group: 'Gestão Animal',
   },
   access: {
-    read: ({ req: { user } }) => Boolean(user?.role === 'Admin' || user?.role === 'Voluntário' || user?.role === 'Veterinário'),
+    read: ({ req: { user } }) => {
+      if (user?.role === 'Admin' || user?.role === 'Voluntário' || user?.role === 'Veterinário') {
+        return true
+      }
+      return {
+        publico: {
+          equals: true,
+        },
+      }
+    },
     create: ({ req: { user } }) => Boolean(user?.role === 'Admin' || user?.role === 'Voluntário' || user?.role === 'Veterinário'),
     update: ({ req: { user } }) => Boolean(user?.role === 'Admin' || user?.role === 'Veterinário'),
     delete: ({ req: { user } }) => Boolean(user?.role === 'Admin'),

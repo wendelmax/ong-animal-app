@@ -11,7 +11,7 @@ export const Animals: CollectionConfig = {
     group: 'Adoções',
   },
   access: {
-    read: ({ req: { user } }) => Boolean(user?.role === 'Admin' || user?.role === 'Voluntário' || user?.role === 'Veterinário'),
+    read: () => true, // Público para consulta no site e na vitrine de adoção
     create: ({ req: { user } }) => Boolean(user?.role === 'Admin' || user?.role === 'Voluntário'),
     update: ({ req: { user } }) => Boolean(user?.role === 'Admin' || user?.role === 'Voluntário' || user?.role === 'Veterinário'),
     delete: ({ req: { user } }) => Boolean(user?.role === 'Admin'),

@@ -11,7 +11,14 @@ export const Pages: CollectionConfig = {
     group: 'Conteúdo',
   },
   access: {
-    read: ({ req: { user } }) => Boolean(user?.role === 'Admin' || user?.role === 'Marketing'),
+    read: ({ req: { user } }) => {
+      if (user?.role === 'Admin' || user?.role === 'Marketing') return true
+      return {
+        status: {
+          equals: 'Publicado',
+        },
+      }
+    },
     create: ({ req: { user } }) => Boolean(user?.role === 'Admin' || user?.role === 'Marketing'),
     update: ({ req: { user } }) => Boolean(user?.role === 'Admin' || user?.role === 'Marketing'),
     delete: ({ req: { user } }) => Boolean(user?.role === 'Admin'),

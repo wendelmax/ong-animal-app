@@ -10,9 +10,17 @@ export const Transactions: CollectionConfig = {
     useAsTitle: 'descricao',
     description: 'Controle financeiro e doações',
     group: 'Financeiro',
+    defaultColumns: ['data', 'descricao', 'tipo', 'valor', 'categoria', 'visivelNoSite'],
   },
   access: {
-    read: ({ req: { user } }) => Boolean(user?.role === 'Admin' || user?.role === 'Financeiro'),
+    read: ({ req: { user } }) => {
+      if (user?.role === 'Admin' || user?.role === 'Financeiro') return true
+      return {
+        visivelNoSite: {
+          equals: true,
+        },
+      }
+    },
     create: ({ req: { user } }) => Boolean(user?.role === 'Admin' || user?.role === 'Financeiro'),
     update: ({ req: { user } }) => Boolean(user?.role === 'Admin' || user?.role === 'Financeiro'),
     delete: ({ req: { user } }) => Boolean(user?.role === 'Admin'),
@@ -73,6 +81,15 @@ export const Transactions: CollectionConfig = {
       label: 'Data do Lançamento',
       required: true,
       defaultValue: () => new Date().toISOString(),
+    },
+    {
+      name: 'visivelNoSite',
+      type: 'checkbox',
+      label: 'Exibir no Portal da Transparência',
+      defaultValue: true,
+      admin: {
+        description: 'Desmarque caso este lançamento seja interno ou confidencial.',
+      },
     },
     {
       name: 'comprovante',

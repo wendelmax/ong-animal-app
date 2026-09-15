@@ -5,35 +5,42 @@ import {
   TrendingUp, 
   TrendingDown, 
   PieChart, 
-  BarChart3, 
   Receipt, 
   Info,
   ShieldCheck,
   Heart
 } from 'lucide-react'
+import { PixCopyButton } from '@/components/PixCopyButton'
 
 export const metadata = {
   title: 'Transparência Financeira | Viralatinhas Sumaré',
   description: 'Confira nossa prestação de contas, doações recebidas e como investimos cada real no bem-estar animal.',
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function TransparencyPage() {
   const payload = await getPayload({ config })
 
-  // Fetch Transactions for the current month (simplified for now)
+  // Busca lançamentos que não estejam ocultos
   const { docs: transactions } = await payload.find({
     collection: 'transactions',
-    limit: 100,
+    where: {
+      visivelNoSite: {
+        not_equals: false,
+      },
+    },
+    limit: 200,
     sort: '-data',
   })
 
-  // Basic Aggregation
+  // Agregação básica
   const totalIncome = transactions
-    .filter(t => t.tipo === 'Receita' || t.tipo === 'Doação')
+    .filter((t) => t.tipo === 'Receita' || t.tipo === 'Doação')
     .reduce((acc, t) => acc + (t.valor || 0), 0)
 
   const totalExpense = transactions
-    .filter(t => t.tipo === 'Despesa')
+    .filter((t) => t.tipo === 'Despesa')
     .reduce((acc, t) => acc + (t.valor || 0), 0)
 
   const balance = totalIncome - totalExpense
@@ -51,8 +58,14 @@ export default async function TransparencyPage() {
             <span className="text-brand-blue">cada centavo.</span>
           </h1>
           <p className="text-xl text-zinc-600 max-w-2xl mx-auto font-medium">
-            Toda doação recebida é transformada diretamente em saúde e dignidade para os animais de Sumaré.
+            Toda doação recebida é transformada diretamente em saúde, castrações e dignidade para os animais de Sumaré.
           </p>
+
+          {/* Quick Pix Card */}
+          <div className="mt-10 inline-flex flex-col sm:flex-row items-center justify-center gap-4 p-6 bg-white rounded-3xl border border-zinc-200 shadow-sm">
+            <span className="text-sm font-bold text-zinc-600">Contribua com qualquer valor via PIX:</span>
+            <PixCopyButton pixKey="viralatinhas@viralatinhas.com" label="Copiar Chave PIX" />
+          </div>
         </div>
 
         {/* Dashboard Overview */}
@@ -92,17 +105,15 @@ export default async function TransparencyPage() {
         </div>
 
         {/* Detailed Transactions List */}
-        <div className="bg-white rounded-[3rem] border border-zinc-100 overflow-hidden">
-          <div className="p-12 border-b border-zinc-100 flex flex-wrap items-center justify-between gap-6">
+        <div className="bg-white rounded-[3rem] border border-zinc-100 overflow-hidden shadow-sm">
+          <div className="p-10 border-b border-zinc-100 flex flex-wrap items-center justify-between gap-6">
             <div>
-              <h3 className="text-3xl font-black text-zinc-900 mb-2">Histórico Recente</h3>
-              <p className="text-zinc-500 font-medium">Listagem detalhada das últimas movimentações financeiras</p>
+              <h3 className="text-3xl font-black text-zinc-900 mb-1">Histórico Recente</h3>
+              <p className="text-zinc-500 font-medium">Listagem detalhada das últimas movimentações financeiras auditadas</p>
             </div>
-            <div className="flex gap-4">
-              <button className="px-6 py-3 bg-zinc-100 text-zinc-600 font-bold rounded-xl flex items-center gap-2 hover:bg-zinc-200 transition-all">
-                <BarChart3 className="w-5 h-5" /> Relatório Completo
-              </button>
-            </div>
+            <span className="px-4 py-2 bg-zinc-100 text-zinc-600 rounded-full font-bold text-xs">
+              {transactions.length} registros exibidos
+            </span>
           </div>
 
           <div className="overflow-x-auto">
@@ -162,13 +173,13 @@ export default async function TransparencyPage() {
 
         {/* Info Card */}
         <div className="mt-16 bg-brand-orange/10 rounded-[3rem] p-12 flex flex-col md:flex-row items-center gap-10">
-          <div className="w-20 h-20 bg-brand-orange text-white rounded-3xl flex items-center justify-center flex-shrink-0">
+          <div className="w-20 h-20 bg-brand-orange text-white rounded-3xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-brand-orange/20">
             <Info className="w-10 h-10" />
           </div>
           <div className="flex-1">
             <h4 className="text-2xl font-black text-zinc-900 mb-2">Por que somos transparentes?</h4>
             <p className="text-zinc-600 font-medium leading-relaxed">
-              Como uma organização mantida exclusivamente por doações, acreditamos que a transparência é a base da nossa relação com a comunidade. 
+              Como uma organização mantida exclusivamente por doações e voluntariado, acreditamos que a transparência é a base da nossa relação com a comunidade de Sumaré. 
               Aqui, você acompanha cada real investido na castração, alimentação e cuidados médicos dos nossos resgatados.
             </p>
           </div>
