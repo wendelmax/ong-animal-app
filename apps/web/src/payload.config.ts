@@ -27,11 +27,13 @@ import { Posts } from './collections/Posts'
 import { Categories } from './collections/Categories'
 import { Header } from './globals/Header'
 import { Footer } from './globals/Footer'
+import { volunteerRegistrationEndpoints } from './endpoints/volunteerRegistration'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
 export default buildConfig({
+  endpoints: volunteerRegistrationEndpoints,
   admin: {
     user: Users.slug,
     importMap: {
