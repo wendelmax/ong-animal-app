@@ -13,13 +13,19 @@ export const metadata = {
 export const dynamic = 'force-dynamic'
 
 export default async function HomePage() {
-  const payload = await getPayload({ config })
-  
-  const { docs: posts } = await payload.find({
-    collection: 'posts',
-    limit: 3,
-    sort: '-publishedAt',
-  })
+  let posts: any[] = []
+
+  try {
+    const payload = await getPayload({ config })
+    const result = await payload.find({
+      collection: 'posts',
+      limit: 3,
+      sort: '-publishedAt',
+    })
+    posts = result.docs || []
+  } catch (err) {
+    console.error('Erro ao buscar posts da home:', err)
+  }
 
   return (
     <div className="min-h-screen bg-white">

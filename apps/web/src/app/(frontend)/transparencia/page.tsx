@@ -20,19 +20,20 @@ export const metadata = {
 export const dynamic = 'force-dynamic'
 
 export default async function TransparencyPage() {
-  const payload = await getPayload({ config })
+  let transactions: any[] = []
 
-  // Busca lançamentos que não estejam ocultos
-  const { docs: transactions } = await payload.find({
-    collection: 'transactions',
-    where: {
-      visivelNoSite: {
-        not_equals: false,
-      },
-    },
-    limit: 200,
-    sort: '-data',
-  })
+  try {
+    const payload = await getPayload({ config })
+    const result = await payload.find({
+      collection: 'transactions',
+      limit: 200,
+      sort: '-data',
+    })
+    // Busca lançamentos que não estejam ocultos (filtra em memória para resiliência)
+    transactions = (result.docs || []).filter((t: any) => t.visivelNoSite !== false)
+  } catch (err) {
+    console.error('Erro ao buscar transações para transparência:', err)
+  }
 
   // Agregação básica
   const totalIncome = transactions

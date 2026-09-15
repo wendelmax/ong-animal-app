@@ -17,22 +17,26 @@ export const dynamic = 'force-dynamic'
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params
-  const payload = await getPayload({ config })
+  let post: any = null
 
-  let post = (
-    await payload.find({
+  try {
+    const payload = await getPayload({ config })
+    const result = await payload.find({
       collection: 'posts',
       where: { slug: { equals: slug } },
       limit: 1,
     })
-  ).docs[0]
+    post = result.docs[0]
 
-  if (!post) {
-    try {
-      post = await payload.findByID({ collection: 'posts', id: slug })
-    } catch {
-      // not an id
+    if (!post) {
+      try {
+        post = await payload.findByID({ collection: 'posts', id: slug })
+      } catch {
+        // not an id
+      }
     }
+  } catch (err) {
+    console.error('Erro ao buscar metadata da notícia:', err)
   }
 
   if (!post) {
@@ -49,24 +53,27 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function NewsDetailPage({ params }: PageProps) {
   const { slug } = await params
-  const payload = await getPayload({ config })
+  let post: any = null
 
-  // Tenta buscar por slug
-  let post = (
-    await payload.find({
+  try {
+    const payload = await getPayload({ config })
+    const result = await payload.find({
       collection: 'posts',
       where: { slug: { equals: slug } },
       limit: 1,
     })
-  ).docs[0]
+    post = result.docs[0]
 
-  // Fallback para ID numérico ou UUID
-  if (!post) {
-    try {
-      post = await payload.findByID({ collection: 'posts', id: slug })
-    } catch {
-      // ignore
+    // Fallback para ID numérico ou UUID
+    if (!post) {
+      try {
+        post = await payload.findByID({ collection: 'posts', id: slug })
+      } catch {
+        // ignore
+      }
     }
+  } catch (err) {
+    console.error('Erro ao buscar notícia:', err)
   }
 
   if (!post) {

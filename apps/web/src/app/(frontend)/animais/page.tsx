@@ -33,11 +33,17 @@ export default async function AnimalsPage({ searchParams }: AnimalsPageProps) {
     }
   }
 
-  const { docs: animals } = await payload.find({
-    collection: 'animals',
-    where: whereConditions,
-    sort: '-dataResgate',
-  })
+  let animals: any[] = []
+  try {
+    const result = await payload.find({
+      collection: 'animals',
+      where: whereConditions,
+      sort: '-dataResgate',
+    })
+    animals = result.docs || []
+  } catch (err) {
+    console.error('Erro ao buscar animais:', err)
+  }
 
   return (
     <div className="min-h-screen bg-zinc-50 pt-32 pb-24">

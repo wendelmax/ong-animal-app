@@ -12,13 +12,19 @@ export const metadata = {
 export const dynamic = 'force-dynamic'
 
 export default async function NewsPage() {
-  const payload = await getPayload({ config })
+  let posts: any[] = []
 
-  const { docs: posts } = await payload.find({
-    collection: 'posts',
-    limit: 20,
-    sort: '-publishedAt',
-  })
+  try {
+    const payload = await getPayload({ config })
+    const result = await payload.find({
+      collection: 'posts',
+      limit: 20,
+      sort: '-publishedAt',
+    })
+    posts = result.docs || []
+  } catch (err) {
+    console.error('Erro ao buscar notícias:', err)
+  }
 
   return (
     <div className="min-h-screen bg-zinc-50 pt-32 pb-24">

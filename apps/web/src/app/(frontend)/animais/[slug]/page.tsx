@@ -28,40 +28,49 @@ export const dynamic = 'force-dynamic'
 
 export default async function AnimalDetailPage({ params }: PageProps) {
   const { slug } = await params
-  const payload = await getPayload({ config })
+  let animal: any = null
+  let events: any[] = []
 
-  // Fetch Animal
-  const animalResult = await payload.find({
-    collection: 'animals',
-    where: {
-      slug: {
-        equals: slug,
+  try {
+    const payload = await getPayload({ config })
+
+    // Fetch Animal
+    const animalResult = await payload.find({
+      collection: 'animals',
+      where: {
+        slug: {
+          equals: slug,
+        },
       },
-    },
-    limit: 1,
-  })
+      limit: 1,
+    })
 
-  const animal = animalResult.docs[0]
+    animal = animalResult.docs[0]
+
+    if (animal) {
+      // Fetch Events (Timeline)
+      const eventsResult = await payload.find({
+        collection: 'animal-events',
+        where: {
+          animal: {
+            equals: animal.id,
+          },
+          publico: {
+            equals: true,
+          },
+        },
+        sort: '-data',
+      })
+
+      events = eventsResult.docs || []
+    }
+  } catch (err) {
+    console.error('Erro ao carregar detalhes do animal:', err)
+  }
 
   if (!animal) {
     return notFound()
   }
-
-  // Fetch Events (Timeline)
-  const eventsResult = await payload.find({
-    collection: 'animal-events',
-    where: {
-      animal: {
-        equals: animal.id,
-      },
-      publico: {
-        equals: true,
-      },
-    },
-    sort: '-data',
-  })
-
-  const events = eventsResult.docs
 
   return (
     <div className="min-h-screen bg-white pt-24 pb-24">

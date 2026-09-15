@@ -16,22 +16,26 @@ export const dynamic = 'force-dynamic'
 
 export default async function Page({ params }: PageProps) {
   const { slug } = await params
-  const payload = await getPayload({ config })
+  let page: any = null
 
-  const result = await payload.find({
-    collection: 'pages',
-    where: {
-      slug: {
-        equals: slug,
+  try {
+    const payload = await getPayload({ config })
+    const result = await payload.find({
+      collection: 'pages',
+      where: {
+        slug: {
+          equals: slug,
+        },
+        status: {
+          equals: 'Publicado',
+        },
       },
-      status: {
-        equals: 'Publicado',
-      },
-    },
-    limit: 1,
-  })
-
-  const page = result.docs[0]
+      limit: 1,
+    })
+    page = result.docs[0]
+  } catch (err) {
+    console.error('Erro ao buscar página institucional:', err)
+  }
 
   if (!page) {
     return notFound()
