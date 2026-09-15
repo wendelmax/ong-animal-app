@@ -12,3 +12,7 @@
 body {
   @apply bg-zinc-50 text-zinc-900;
 }
+
+.form-input {
+  @apply mt-2 block w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 font-medium outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20;
+}
