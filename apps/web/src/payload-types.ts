@@ -338,6 +338,10 @@ export interface Transaction {
       )
     | null;
   data: string;
+  /**
+   * Desmarque caso este lançamento seja interno ou confidencial.
+   */
+  visivelNoSite?: boolean | null;
   comprovante?: (number | null) | Media;
   updatedAt: string;
   createdAt: string;
@@ -450,7 +454,11 @@ export interface Post {
   id: number;
   title: string;
   /**
-   * Um resumo curto para aparecer no feed de notícias na página inicial.
+   * Identificador único na URL (ex: feira-de-adocao-sumare). Se vazio, será preenchido automaticamente a partir do título.
+   */
+  slug?: string | null;
+  /**
+   * Um resumo curto para aparecer no feed de notícias na página inicial e listagem.
    */
   excerpt?: string | null;
   category?: (number | null) | Category;
@@ -743,6 +751,7 @@ export interface TransactionsSelect<T extends boolean = true> {
   descricao?: T;
   categoria?: T;
   data?: T;
+  visivelNoSite?: T;
   comprovante?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -809,6 +818,7 @@ export interface PagesSelect<T extends boolean = true> {
  */
 export interface PostsSelect<T extends boolean = true> {
   title?: T;
+  slug?: T;
   excerpt?: T;
   category?: T;
   coverImage?: T;

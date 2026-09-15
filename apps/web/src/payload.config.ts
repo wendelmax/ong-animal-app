@@ -67,7 +67,7 @@ export default buildConfig({
     supportedLanguages: { pt },
   },
   editor: lexicalEditor(),
-  secret: process.env.PAYLOAD_SECRET || '',
+  secret: process.env.PAYLOAD_SECRET || 'viralatinhas-default-payload-secret-key-change-in-production',
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
@@ -75,7 +75,7 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URL || '',
     },
-    push: true, // Auto-cria as tabelas no banco de dados (ideal para início de projeto)
+    push: process.env.NODE_ENV === 'development',
   }),
   sharp,
   plugins: [],

@@ -12,6 +12,8 @@ interface PageProps {
   }>
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function Page({ params }: PageProps) {
   const { slug } = await params
   const payload = await getPayload({ config })
@@ -112,16 +114,20 @@ export default async function Page({ params }: PageProps) {
 }
 
 export async function generateStaticParams() {
-  const payload = await getPayload({ config })
-  const pages = await payload.find({
-    collection: 'pages',
-    limit: 100,
-    select: {
-      slug: true,
-    },
-  })
+  try {
+    const payload = await getPayload({ config })
+    const pages = await payload.find({
+      collection: 'pages',
+      limit: 100,
+      select: {
+        slug: true,
+      },
+    })
 
-  return pages.docs.map((doc) => ({
-    slug: doc.slug,
-  }))
+    return pages.docs.map((doc) => ({
+      slug: doc.slug,
+    }))
+  } catch {
+    return []
+  }
 }
