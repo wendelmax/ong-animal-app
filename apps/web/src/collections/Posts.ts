@@ -9,6 +9,7 @@ export const Posts: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     group: 'Conteúdo',
+    defaultColumns: ['title', 'slug', 'publishedAt', 'category'],
   },
   access: {
     read: () => true,
@@ -24,11 +25,35 @@ export const Posts: CollectionConfig = {
       label: 'Título da Postagem',
     },
     {
+      name: 'slug',
+      type: 'text',
+      label: 'Slug (URL amigável)',
+      index: true,
+      admin: {
+        description: 'Identificador único na URL (ex: feira-de-adocao-sumare). Se vazio, será preenchido automaticamente a partir do título.',
+      },
+      hooks: {
+        beforeValidate: [
+          ({ value, data }) => {
+            if (!value && data?.title) {
+              return (data.title as string)
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/(^-|-$)+/g, '')
+            }
+            return value
+          },
+        ],
+      },
+    },
+    {
       name: 'excerpt',
       type: 'textarea',
       label: 'Resumo Breve',
       admin: {
-        description: 'Um resumo curto para aparecer no feed de notícias na página inicial.',
+        description: 'Um resumo curto para aparecer no feed de notícias na página inicial e listagem.',
       },
     },
     {
@@ -47,6 +72,7 @@ export const Posts: CollectionConfig = {
       name: 'publishedAt',
       type: 'date',
       label: 'Data de Publicação',
+      defaultValue: () => new Date().toISOString(),
       admin: {
         date: {
           pickerAppearance: 'dayAndTime',

@@ -1,20 +1,57 @@
 import React from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
+import { HeaderNav, NavItem } from './HeaderNav'
+import { getPayload } from 'payload'
+import config from '@/payload.config'
 
-export const Header = () => {
+export const Header = async () => {
+  let navItems: NavItem[] | undefined
+
+  try {
+    const payload = await getPayload({ config })
+    const headerGlobal = await payload.findGlobal({
+      slug: 'header',
+    })
+    if (headerGlobal?.navItems && headerGlobal.navItems.length > 0) {
+      navItems = headerGlobal.navItems.map((item: any) => ({
+        label: item.label,
+        url: item.url,
+      }))
+    }
+  } catch (err) {
+    // Fallback silencioso para itens padrão caso DB ainda esteja inicializando
+  }
+
   return (
     <header className="sticky top-0 z-50">
       {/* Top Bar */}
       <div className="bg-brand-blue py-2 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto flex justify-between items-center text-white text-xs font-medium">
           <div className="flex items-center gap-4">
-            <span>📞 (19) 99708-0388</span>
-            <span className="hidden sm:inline">📧 viralatinhas@viralatinhas.com</span>
+            <a href="https://wa.me/5519997080388" target="_blank" rel="noopener noreferrer" className="hover:text-brand-orange transition-colors">
+              📞 (19) 99708-0388
+            </a>
+            <a href="mailto:viralatinhas@viralatinhas.com" className="hidden sm:inline hover:text-brand-orange transition-colors">
+              📧 viralatinhas@viralatinhas.com
+            </a>
           </div>
           <div className="flex items-center gap-4">
-            <a href="https://instagram.com/viralatinhasoficial" target="_blank" className="hover:text-brand-orange transition-colors">Instagram</a>
-            <a href="#" className="hover:text-brand-orange transition-colors">Facebook</a>
+            <a
+              href="https://instagram.com/viralatinhasoficial"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-brand-orange transition-colors"
+            >
+              Instagram
+            </a>
+            <a
+              href="https://facebook.com/viralatinhasoficial"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-brand-orange transition-colors"
+            >
+              Facebook
+            </a>
           </div>
         </div>
       </div>
@@ -33,26 +70,7 @@ export const Header = () => {
               </div>
             </Link>
 
-            <nav className="hidden md:flex items-center gap-8">
-              <Link href="/animais" className="text-zinc-700 hover:text-brand-magenta font-bold transition-colors">
-                Adoção
-              </Link>
-              <Link href="/quem-somos" className="text-zinc-700 hover:text-brand-magenta font-bold transition-colors">
-                Sobre Nós
-              </Link>
-              <Link href="/como-ajudar" className="text-zinc-700 hover:text-brand-magenta font-bold transition-colors">
-                Como Ajudar
-              </Link>
-              <Link href="/transparencia" className="text-zinc-700 hover:text-brand-magenta font-bold transition-colors">
-                Transparência
-              </Link>
-              <Link 
-                href="/como-ajudar#doar" 
-                className="bg-brand-orange text-white px-6 py-2.5 rounded-full font-black hover:scale-105 shadow-md shadow-brand-orange/20 transition-all uppercase tracking-wider text-sm"
-              >
-                ❤️ Quero Doar
-              </Link>
-            </nav>
+            <HeaderNav items={navItems} />
           </div>
         </div>
       </div>

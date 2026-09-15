@@ -1,7 +1,7 @@
 {
-  "name": "blank",
+  "name": "ong-animal-web",
   "version": "1.0.0",
-  "description": "A blank template to get started with Payload 3.0",
+  "description": "Aplicação web e CMS da Associação Viralatinhas Sumaré",
   "license": "MIT",
   "type": "module",
   "scripts": {

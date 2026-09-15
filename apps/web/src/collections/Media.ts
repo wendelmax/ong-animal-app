@@ -1,6 +1,9 @@
 import type { CollectionConfig } from 'payload'
 import { uploadToBlob } from '../hooks/blobUpload'
 
+const hasBlobToken = Boolean(process.env.BLOB_READ_WRITE_TOKEN)
+const blobHost = process.env.BLOB_STORAGE_URL || 'https://qhu14etz7tk70zzr.public.blob.vercel-storage.com'
+
 export const Media: CollectionConfig = {
   slug: 'media',
   labels: {
@@ -20,8 +23,12 @@ export const Media: CollectionConfig = {
     beforeChange: [uploadToBlob],
     afterRead: [
       ({ doc }) => {
-        const blobHost = 'https://qhu14etz7tk70zzr.public.blob.vercel-storage.com'
-        if (doc.filename) {
+        // Se já possui URL externa válida, mantém
+        if (doc.url && (doc.url.startsWith('http://') || doc.url.startsWith('https://'))) {
+          return doc
+        }
+        // Se estiver em produção com Blob e tiver filename
+        if (hasBlobToken && doc.filename) {
           doc.url = `${blobHost}/media/${doc.filename}`
         }
         return doc
@@ -33,10 +40,12 @@ export const Media: CollectionConfig = {
       name: 'alt',
       type: 'text',
       required: true,
+      label: 'Texto Alternativo (Acessibilidade)',
     },
   ],
   upload: {
-    disableLocalStorage: true,
+    // Permite armazenamento local quando executado em desenvolvimento sem token do Vercel Blob
+    disableLocalStorage: hasBlobToken,
     mimeTypes: ['image/*', 'application/pdf'],
   },
 }
