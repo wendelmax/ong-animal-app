@@ -92,7 +92,9 @@ Na primeira implementação, o serviço de domínio deverá encapsular a criaç�
 
 ### `volunteer-files`
 
-- `volunteer`: relação obrigatória;
+- `volunteer`: relação opcional durante `PENDING` e obrigatória quando o arquivo estiver associado a uma submissão aceita;
+- `invitation`: relação obrigatória com o convite que originou o upload;
+- `submissionId`: identificador obrigatório da sessão de submissão;
 - `purpose`: `PERSONAL_PHOTO` ou `IDENTITY_DOCUMENT`;
 - `storageProvider`: `R2`;
 - `objectKey`: chave privada única;
