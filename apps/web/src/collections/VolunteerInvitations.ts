@@ -3,6 +3,7 @@ import { canManageVolunteerInvitations } from '../lib/volunteer-registration/acc
 
 const allowed = ({ req: { user } }: any) => canManageVolunteerInvitations(user)
 const safeUpdate = ({ req: { user }, data }: any) => canManageVolunteerInvitations(user) && Object.keys(data || {}).every((key) => key === 'status')
+const setCreatedByOnCreate = ({ data, operation, req }: any) => operation === 'create' && req.user?.id ? { ...data, createdBy: req.user.id } : data
 
 export const VolunteerInvitations: CollectionConfig = {
   slug: 'volunteer-invitations',
@@ -14,6 +15,7 @@ export const VolunteerInvitations: CollectionConfig = {
     update: safeUpdate,
     delete: ({ req: { user } }) => user?.role === 'Admin',
   },
+  hooks: { beforeChange: [setCreatedByOnCreate] },
   fields: [
     { name: 'tokenHash', type: 'text', unique: true, admin: { hidden: true, readOnly: true } },
     { name: 'createdBy', type: 'relationship', relationTo: 'users', required: true, admin: { readOnly: true } },
