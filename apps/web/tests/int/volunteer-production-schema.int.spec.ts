@@ -53,4 +53,24 @@ describe('production schema configuration', () => {
     expect(payloadConfig).toContain('uploadthingStorage')
     expect(mediaConfig).not.toContain('beforeChange: [uploadToBlob]')
   })
+
+  it('makes the compatibility migration rerunnable and keeps required evidence relationships', () => {
+    const migrationSource = existsSync(migrationPath) ? readFileSync(migrationPath, 'utf8') : ''
+
+    expect(migrationSource).toContain('CREATE TABLE IF NOT EXISTS')
+    expect(migrationSource).toContain('ADD COLUMN IF NOT EXISTS')
+    expect(migrationSource).toContain('CREATE INDEX IF NOT EXISTS')
+    expect(migrationSource).toContain('duplicate_object')
+    expect(migrationSource).toContain(
+      'volunteer_files_invitation_id_volunteer_invitations_id_fk\" FOREIGN KEY (\"invitation_id\") REFERENCES \"public\".\"volunteer_invitations\"(\"id\") ON DELETE restrict',
+    )
+    expect(migrationSource).toContain(
+      'volunteer_term_acceptances_volunteer_id_volunteers_id_fk\" FOREIGN KEY (\"volunteer_id\") REFERENCES \"public\".\"volunteers\"(\"id\") ON DELETE restrict',
+    )
+    expect(migrationSource).toContain(
+      'volunteer_term_acceptances_term_version_id_membership_term_versions_id_fk\" FOREIGN KEY (\"term_version_id\") REFERENCES \"public\".\"membership_term_versions\"(\"id\") ON DELETE restrict',
+    )
+    expect(migrationSource).not.toContain('DROP TABLE \"volunteer_invitations\" CASCADE')
+    expect(migrationSource).not.toContain('DROP TABLE \"volunteer_files\" CASCADE')
+  })
 })
