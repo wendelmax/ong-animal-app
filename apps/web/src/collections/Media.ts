@@ -1,5 +1,4 @@
 import type { CollectionConfig } from 'payload'
-import { uploadToBlob } from '../hooks/blobUpload'
 
 const hasBlobToken = Boolean(process.env.BLOB_READ_WRITE_TOKEN)
 const blobHost = process.env.BLOB_STORAGE_URL || 'https://qhu14etz7tk70zzr.public.blob.vercel-storage.com'
@@ -20,7 +19,6 @@ export const Media: CollectionConfig = {
     delete: ({ req: { user } }) => Boolean(user?.role === 'Admin'),
   },
   hooks: {
-    beforeChange: [uploadToBlob],
     afterRead: [
       ({ doc }) => {
         // Se já possui URL externa válida, mantém
