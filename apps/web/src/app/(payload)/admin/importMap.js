@@ -25,6 +25,7 @@ import { default as default_aea7e89ecaf1eeb66a93f67becab22c6 } from '../../../co
 import { default as default_3eb5d29c589ee02b4b0721bb284052d9 } from '../../../components/Admin/VolunteerReviewActions'
 import { AdminIcon as AdminIcon_9a1874b676b04705842f901c297a6dc9 } from '../../../components/AdminGraphics'
 import { AdminLogo as AdminLogo_9a1874b676b04705842f901c297a6dc9 } from '../../../components/AdminGraphics'
+import { UploadthingClientUploadHandler as UploadthingClientUploadHandler_749dcaa11bb61b873d113cb6c609bc10 } from '@payloadcms/storage-uploadthing/client'
 import { default as default_be62dc7d4875fc22a502f54e23a3b5f1 } from '../../../components/Admin/Dashboard'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
@@ -57,6 +58,7 @@ export const importMap = {
   "/components/Admin/VolunteerReviewActions#default": default_3eb5d29c589ee02b4b0721bb284052d9,
   "/components/AdminGraphics#AdminIcon": AdminIcon_9a1874b676b04705842f901c297a6dc9,
   "/components/AdminGraphics#AdminLogo": AdminLogo_9a1874b676b04705842f901c297a6dc9,
+  "@payloadcms/storage-uploadthing/client#UploadthingClientUploadHandler": UploadthingClientUploadHandler_749dcaa11bb61b873d113cb6c609bc10,
   "/components/Admin/Dashboard#default": default_be62dc7d4875fc22a502f54e23a3b5f1,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }

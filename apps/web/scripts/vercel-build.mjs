@@ -18,4 +18,5 @@ if (process.env.VERCEL_ENV === 'production') {
   run('migrate')
 }
 
+run('generate:importmap')
 run('build')

@@ -46,6 +46,8 @@ describe('production schema configuration', () => {
     expect(buildScript).toContain("run('migrate')")
     expect(buildScript).toContain("shell: process.platform === 'win32'")
     expect(buildScript).toContain("input: script === 'migrate' ? 'y\\n' : undefined")
+    expect(buildScript).toContain("run('generate:importmap')")
+    expect(buildScript.indexOf("run('generate:importmap')")).toBeLessThan(buildScript.indexOf("run('build')"))
   })
 
   it('configures a Payload storage adapter for media in Vercel', () => {
