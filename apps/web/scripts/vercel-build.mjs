@@ -2,10 +2,12 @@ import { spawnSync } from 'node:child_process'
 
 const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm'
 
-const run = (script) => {
-  const result = spawnSync(npm, ['run', script], {
+const run = (script, args = []) => {
+  const result = spawnSync(npm, ['run', script, '--', ...args], {
     env: process.env,
-    stdio: 'inherit',
+    input: script === 'migrate' ? 'y\n' : undefined,
+    stdio: script === 'migrate' ? ['pipe', 'inherit', 'inherit'] : 'inherit',
+    shell: process.platform === 'win32',
   })
 
   if (result.error) throw result.error
@@ -17,4 +19,3 @@ if (process.env.VERCEL_ENV === 'production') {
 }
 
 run('build')
-
