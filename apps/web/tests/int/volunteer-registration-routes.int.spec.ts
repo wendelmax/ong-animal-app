@@ -8,7 +8,9 @@ vi.mock('@/lib/volunteer-registration/http', () => publicRouteMock)
 
 describe('public volunteer App Router routes', () => {
   it('resolves the public invitation token through an explicit Next route', async () => {
-    publicRouteMock.getPublicInvitationHttp.mockResolvedValue(new Response(JSON.stringify({ ok: true }), { status: 200 }))
+    publicRouteMock.getPublicInvitationHttp.mockResolvedValue(
+      new Response(JSON.stringify({ ok: true }), { status: 200 }),
+    )
     const { GET } = await import('@/app/api/volunteer-invitations/[token]/public/route')
 
     const response = await GET(
@@ -17,7 +19,9 @@ describe('public volunteer App Router routes', () => {
     )
 
     expect(response.status).toBe(200)
-    expect(publicRouteMock.getPublicInvitationHttp).toHaveBeenCalledWith(expect.any(Request), 'token-123')
+    expect(publicRouteMock.getPublicInvitationHttp).toHaveBeenCalledWith(
+      expect.any(Request),
+      'token-123',
+    )
   })
 })
-

@@ -1,7 +1,8 @@
 import type { CollectionConfig } from 'payload'
 
 const hasBlobToken = Boolean(process.env.BLOB_READ_WRITE_TOKEN)
-const blobHost = process.env.BLOB_STORAGE_URL || 'https://qhu14etz7tk70zzr.public.blob.vercel-storage.com'
+const blobHost =
+  process.env.BLOB_STORAGE_URL || 'https://qhu14etz7tk70zzr.public.blob.vercel-storage.com'
 
 export const Media: CollectionConfig = {
   slug: 'media',
@@ -14,8 +15,20 @@ export const Media: CollectionConfig = {
   },
   access: {
     read: () => true,
-    create: ({ req: { user } }) => Boolean(user?.role === 'Admin' || user?.role === 'Marketing' || user?.role === 'Voluntário' || user?.role === 'Veterinário'),
-    update: ({ req: { user } }) => Boolean(user?.role === 'Admin' || user?.role === 'Marketing' || user?.role === 'Voluntário' || user?.role === 'Veterinário'),
+    create: ({ req: { user } }) =>
+      Boolean(
+        user?.role === 'Admin' ||
+        user?.role === 'Marketing' ||
+        user?.role === 'Voluntário' ||
+        user?.role === 'Veterinário',
+      ),
+    update: ({ req: { user } }) =>
+      Boolean(
+        user?.role === 'Admin' ||
+        user?.role === 'Marketing' ||
+        user?.role === 'Voluntário' ||
+        user?.role === 'Veterinário',
+      ),
     delete: ({ req: { user } }) => Boolean(user?.role === 'Admin'),
   },
   hooks: {

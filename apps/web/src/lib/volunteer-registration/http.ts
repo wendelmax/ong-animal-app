@@ -17,9 +17,10 @@ const ipFrom = (request: Request) =>
   'unknown'
 
 const errorResponse = (error: unknown) => {
-  const normalized = error instanceof VolunteerRegistrationError
-    ? error
-    : new VolunteerRegistrationError('INTERNAL_ERROR', 500)
+  const normalized =
+    error instanceof VolunteerRegistrationError
+      ? error
+      : new VolunteerRegistrationError('INTERNAL_ERROR', 500)
 
   return Response.json({ error: normalized.code }, { status: normalized.status })
 }
@@ -27,13 +28,22 @@ const errorResponse = (error: unknown) => {
 const withPublicRequest = async <T>(
   request: Request,
   token: string,
-  operation: (context: { payload: any; req: any; ipAddress: string; userAgent: string }) => Promise<T>,
+  operation: (context: {
+    payload: any
+    req: any
+    ipAddress: string
+    userAgent: string
+  }) => Promise<T>,
 ) => {
   try {
     const tokenHash = createHash('sha256').update(token, 'utf8').digest('hex')
     const ipAddress = ipFrom(request)
     const [inviteResult, ipResult] = await Promise.all([
-      checkPublicRateLimit({ key: `invite:${tokenHash}:${ipAddress}`, limit: 30, windowSeconds: 3600 }),
+      checkPublicRateLimit({
+        key: `invite:${tokenHash}:${ipAddress}`,
+        limit: 30,
+        windowSeconds: 3600,
+      }),
       checkPublicRateLimit({ key: `ip:${ipAddress}`, limit: 120, windowSeconds: 3600 }),
     ])
     if (!inviteResult.success || !ipResult.success) {
@@ -71,4 +81,3 @@ export const submitRegistrationHttp = async (request: Request, token: string) =>
   withPublicRequest(request, token, async (context) =>
     submitRegistration(context, token, await request.json()),
   )
-

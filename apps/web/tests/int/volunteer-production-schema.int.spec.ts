@@ -4,7 +4,9 @@ import { describe, expect, it } from 'vitest'
 
 const appRoot = resolve(import.meta.dirname, '../..')
 const configSource = () => readFileSync(resolve(appRoot, 'src/payload.config.ts'), 'utf8')
-const migrationName = readdirSync(resolve(appRoot, 'src/migrations')).find((name) => name.endsWith('_production_schema_compatibility.ts'))
+const migrationName = readdirSync(resolve(appRoot, 'src/migrations')).find((name) =>
+  name.endsWith('_production_schema_compatibility.ts'),
+)
 const migrationPath = migrationName ? resolve(appRoot, 'src/migrations', migrationName) : ''
 
 describe('production schema configuration', () => {
@@ -14,7 +16,10 @@ describe('production schema configuration', () => {
     expect(existsSync(migrationPath)).toBe(true)
 
     const migrationSource = existsSync(migrationPath) ? readFileSync(migrationPath, 'utf8') : ''
-    const excerptMigration = readFileSync(resolve(appRoot, 'src/migrations/20260527_031700_add_excerpt.ts'), 'utf8')
+    const excerptMigration = readFileSync(
+      resolve(appRoot, 'src/migrations/20260527_031700_add_excerpt.ts'),
+      'utf8',
+    )
     const migrationChain = `${excerptMigration}\n${migrationSource}`
     expect(migrationChain).toContain('posts')
     expect(migrationChain).toContain('slug')

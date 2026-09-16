@@ -73,13 +73,22 @@ export default buildConfig({
     Categories,
   ],
   globals: [Header, Footer],
-  cors: [process.env.NEXT_PUBLIC_SERVER_URL || '', 'https://www.viralatinhas.com', 'https://viralatinhas.com'].filter(Boolean),
-  csrf: [process.env.NEXT_PUBLIC_SERVER_URL || '', 'https://www.viralatinhas.com', 'https://viralatinhas.com'].filter(Boolean),
+  cors: [
+    process.env.NEXT_PUBLIC_SERVER_URL || '',
+    'https://www.viralatinhas.com',
+    'https://viralatinhas.com',
+  ].filter(Boolean),
+  csrf: [
+    process.env.NEXT_PUBLIC_SERVER_URL || '',
+    'https://www.viralatinhas.com',
+    'https://viralatinhas.com',
+  ].filter(Boolean),
   i18n: {
     supportedLanguages: { pt },
   },
   editor: lexicalEditor(),
-  secret: process.env.PAYLOAD_SECRET || 'viralatinhas-default-payload-secret-key-change-in-production',
+  secret:
+    process.env.PAYLOAD_SECRET || 'viralatinhas-default-payload-secret-key-change-in-production',
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },

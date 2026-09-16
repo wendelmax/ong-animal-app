@@ -8,7 +8,9 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('payload', () => ({ getPayload: mocks.getPayload }))
 vi.mock('@/payload.config', () => ({ default: {} }))
-vi.mock('@/lib/volunteer-registration/rate-limit', () => ({ checkPublicRateLimit: mocks.checkPublicRateLimit }))
+vi.mock('@/lib/volunteer-registration/rate-limit', () => ({
+  checkPublicRateLimit: mocks.checkPublicRateLimit,
+}))
 vi.mock('@/lib/volunteer-registration/service', () => ({
   getPublicInvitation: mocks.getPublicInvitation,
 }))
@@ -35,4 +37,3 @@ describe('public volunteer HTTP dispatcher', () => {
     )
   })
 })
-
