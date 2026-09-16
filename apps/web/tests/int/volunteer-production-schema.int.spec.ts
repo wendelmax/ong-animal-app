@@ -44,6 +44,8 @@ describe('production schema configuration', () => {
     const buildScript = existsSync(buildScriptPath) ? readFileSync(buildScriptPath, 'utf8') : ''
     expect(buildScript).toContain("process.env.VERCEL_ENV === 'production'")
     expect(buildScript).toContain("run('migrate')")
+    expect(buildScript).toContain("shell: process.platform === 'win32'")
+    expect(buildScript).toContain("input: script === 'migrate' ? 'y\\n' : undefined")
   })
 
   it('configures a Payload storage adapter for media in Vercel', () => {
