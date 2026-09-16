@@ -10,6 +10,6 @@
     "dev": "npm run dev --workspaces",
     "build": "npm run build --workspaces",
     "lint": "npm run lint --workspaces",
-    "vercel-build": "npm --workspace apps/web run migrate && npm --workspace apps/web run build"
+    "vercel-build": "npm --workspace apps/web run vercel-build"
   }
 }

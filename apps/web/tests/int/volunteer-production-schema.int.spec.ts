@@ -33,9 +33,17 @@ describe('production schema configuration', () => {
   it('runs migrations before the Vercel build', () => {
     const rootPackage = readFileSync(resolve(appRoot, '../../package.json'), 'utf8')
     const vercelConfig = readFileSync(resolve(appRoot, '../../vercel.json'), 'utf8')
+    const appVercelConfig = readFileSync(resolve(appRoot, 'vercel.json'), 'utf8')
 
     expect(rootPackage).toContain('vercel-build')
     expect(vercelConfig).toContain('npm run vercel-build')
+    expect(appVercelConfig).toContain('npm run vercel-build')
+    expect(existsSync(resolve(appRoot, 'scripts/vercel-build.mjs'))).toBe(true)
+
+    const buildScriptPath = resolve(appRoot, 'scripts/vercel-build.mjs')
+    const buildScript = existsSync(buildScriptPath) ? readFileSync(buildScriptPath, 'utf8') : ''
+    expect(buildScript).toContain("process.env.VERCEL_ENV === 'production'")
+    expect(buildScript).toContain("run('migrate')")
   })
 
   it('configures a Payload storage adapter for media in Vercel', () => {
