@@ -105,6 +105,18 @@ export const Volunteers: CollectionConfig = {
     { name: 'dataIngresso', type: 'date', label: 'Data de ingresso', access: noDirectUpdate },
     { name: 'horasMediasMes', type: 'number', label: 'Horas médias por mês', access: noDirectUpdate },
     { name: 'sourceInvitation', type: 'relationship', relationTo: 'volunteer-invitations', access: noDirectUpdate, admin: { readOnly: true } },
+    {
+      name: 'termAcceptances',
+      type: 'join',
+      label: 'Histórico de termos aceitos',
+      collection: 'volunteer-term-acceptances',
+      on: 'volunteer',
+      access: { read: ({ req: { user } }: any) => user?.role === 'Admin' },
+      admin: {
+        defaultColumns: ['termVersion', 'acceptedAt', 'contentHashAtAcceptance'],
+        description: 'Histórico somente leitura da versão do termo aceita pelo voluntário.',
+      },
+    },
     { name: 'submittedAt', type: 'date', access: noDirectUpdate, admin: { readOnly: true } },
     { name: 'reviewedAt', type: 'date', access: noDirectUpdate, admin: { readOnly: true } },
     { name: 'reviewedBy', type: 'relationship', relationTo: 'users', access: noDirectUpdate, admin: { readOnly: true } },
