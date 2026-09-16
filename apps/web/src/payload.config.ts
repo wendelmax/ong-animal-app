@@ -4,7 +4,7 @@ import path from 'path'
 import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 import { pt } from '@payloadcms/translations/languages/pt'
-// Storage adapters (vercel-blob, uploadthing) crash admin hydration via plugin-cloud-storage
+import { uploadthingStorage } from '@payloadcms/storage-uploadthing'
 import sharp from 'sharp'
 
 import { Users } from './collections/Users'
@@ -73,13 +73,22 @@ export default buildConfig({
     Categories,
   ],
   globals: [Header, Footer],
-  cors: [process.env.NEXT_PUBLIC_SERVER_URL || '', 'https://www.viralatinhas.com', 'https://viralatinhas.com'].filter(Boolean),
-  csrf: [process.env.NEXT_PUBLIC_SERVER_URL || '', 'https://www.viralatinhas.com', 'https://viralatinhas.com'].filter(Boolean),
+  cors: [
+    process.env.NEXT_PUBLIC_SERVER_URL || '',
+    'https://www.viralatinhas.com',
+    'https://viralatinhas.com',
+  ].filter(Boolean),
+  csrf: [
+    process.env.NEXT_PUBLIC_SERVER_URL || '',
+    'https://www.viralatinhas.com',
+    'https://viralatinhas.com',
+  ].filter(Boolean),
   i18n: {
     supportedLanguages: { pt },
   },
   editor: lexicalEditor(),
-  secret: process.env.PAYLOAD_SECRET || 'viralatinhas-default-payload-secret-key-change-in-production',
+  secret:
+    process.env.PAYLOAD_SECRET || 'viralatinhas-default-payload-secret-key-change-in-production',
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
@@ -87,8 +96,17 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URL || '',
     },
-    push: true, // Auto-cria e sincroniza as tabelas no banco de dados
+    migrationDir: path.resolve(dirname, 'migrations'),
+    push: process.env.NODE_ENV !== 'production',
   }),
   sharp,
-  plugins: [],
+  plugins: [
+    uploadthingStorage({
+      enabled: Boolean(process.env.UPLOADTHING_TOKEN),
+      collections: { media: true },
+      options: {
+        token: process.env.UPLOADTHING_TOKEN || '',
+      },
+    }),
+  ],
 })

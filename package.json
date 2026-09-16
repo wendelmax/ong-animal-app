@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "npm run dev --workspaces",
     "build": "npm run build --workspaces",
-    "lint": "npm run lint --workspaces"
+    "lint": "npm run lint --workspaces",
+    "vercel-build": "npm --workspace apps/web run vercel-build"
   }
 }
