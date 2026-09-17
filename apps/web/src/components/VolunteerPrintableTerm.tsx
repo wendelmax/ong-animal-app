@@ -1,3 +1,5 @@
+'use client'
+
 type PrintableTermProps = {
   volunteer: { fullName: string; cpf: string }
   acceptance: { acceptedAt: string; ipAddress: string; userAgent: string; statement: string }
