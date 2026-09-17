@@ -28,5 +28,6 @@ describeWithDatabase('membership term immutability', () => {
     const retired = await payload.create({ collection: 'membership-term-versions', data: { version: `retired-${randomUUID()}`, content: 'conteúdo retirado', effectiveFrom: new Date().toISOString(), status: 'RETIRED' }, overrideAccess: true })
     ids.push(retired.id)
     await expect(payload.update({ collection: 'membership-term-versions', id: retired.id, data: { content: 'conteúdo alterado' }, overrideAccess: true })).rejects.toThrow('TERM_VERSION_IMMUTABLE')
+    await expect(payload.delete({ collection: 'membership-term-versions', id: retired.id, overrideAccess: true })).rejects.toThrow('TERM_VERSION_IMMUTABLE')
   })
 })
