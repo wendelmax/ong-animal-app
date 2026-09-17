@@ -2,9 +2,11 @@ import { createHash } from 'node:crypto'
 import { getPayload } from 'payload'
 
 import config from '@/payload.config'
+import { authenticatePayloadRequest } from './auth'
 import { checkPublicRateLimit } from './rate-limit'
 import {
   confirmUpload,
+  createInvitation,
   createUploadIntent,
   getPublicInvitation,
   submitRegistration,
@@ -81,3 +83,14 @@ export const submitRegistrationHttp = async (request: Request, token: string) =>
   withPublicRequest(request, token, async (context) =>
     submitRegistration(context, token, await request.json()),
   )
+
+export const createInvitationHttp = async (request: Request) => {
+  try {
+    const { payload, req, user } = await authenticatePayloadRequest(request)
+    const input = (await request.json()) as { expiresAt: string; maxUses?: number }
+    const { url, expiresAt } = await createInvitation({ payload, req, user }, input)
+    return Response.json({ url, expiresAt })
+  } catch (error) {
+    return errorResponse(error)
+  }
+}

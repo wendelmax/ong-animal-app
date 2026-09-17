@@ -1,7 +1,7 @@
 import type { Endpoint } from 'payload'
 import { createHash } from 'node:crypto'
 import { checkPublicRateLimit } from '../lib/volunteer-registration/rate-limit'
-import { createFileDownload, createInvitation, createUploadIntent, confirmUpload, getPublicInvitation, reviewVolunteer, submitRegistration, VolunteerRegistrationError } from '../lib/volunteer-registration/service'
+import { createFileDownload, createUploadIntent, confirmUpload, getPublicInvitation, reviewVolunteer, submitRegistration, VolunteerRegistrationError } from '../lib/volunteer-registration/service'
 
 export const ipFrom = (req: any) => req.ip || req.headers.get('x-real-ip') || req.headers.get('x-forwarded-for')?.split(',').at(-1)?.trim() || 'unknown'
 const publicContext = (req: any) => ({ payload: req.payload, req, ipAddress: ipFrom(req), userAgent: req.headers.get('user-agent') || 'unknown' })
@@ -21,7 +21,6 @@ const rateLimit = async (req: any, token: string) => {
 }
 
 export const volunteerRegistrationEndpoints: Endpoint[] = [
-  { path: '/volunteer-invitations/generate', method: 'post', handler: respond(async (req: any) => createInvitation({ payload: req.payload, req, user: req.user }, await body(req))) },
   { path: '/volunteer-invitations/:token/public', method: 'get', handler: async (req: any) => { try { await rateLimit(req, req.routeParams.token); return Response.json(await getPublicInvitation(publicContext(req), req.routeParams.token)) } catch (error) { const e = error instanceof VolunteerRegistrationError ? error : new VolunteerRegistrationError('INTERNAL_ERROR', 500); return Response.json({ error: e.code }, { status: e.status }) } } },
   { path: '/volunteer-invitations/:token/uploads', method: 'post', handler: async (req: any) => { try { await rateLimit(req, req.routeParams.token); return Response.json(await createUploadIntent(publicContext(req), req.routeParams.token, await body(req))) } catch (error) { const e = error instanceof VolunteerRegistrationError ? error : new VolunteerRegistrationError('INTERNAL_ERROR', 500); return Response.json({ error: e.code }, { status: e.status }) } } },
   { path: '/volunteer-invitations/:token/uploads/confirm', method: 'post', handler: async (req: any) => { try { await rateLimit(req, req.routeParams.token); return Response.json(await confirmUpload(publicContext(req), req.routeParams.token, await body(req))) } catch (error) { const e = error instanceof VolunteerRegistrationError ? error : new VolunteerRegistrationError('INTERNAL_ERROR', 500); return Response.json({ error: e.code }, { status: e.status }) } } },

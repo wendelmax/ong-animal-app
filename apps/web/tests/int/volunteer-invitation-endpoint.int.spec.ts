@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 
 const mocks = vi.hoisted(() => ({
+  authenticatePayloadRequest: vi.fn(),
   createInvitation: vi.fn(),
   checkPublicRateLimit: vi.fn(),
   createFileDownload: vi.fn(),
@@ -9,9 +10,17 @@ const mocks = vi.hoisted(() => ({
   getPublicInvitation: vi.fn(),
   reviewVolunteer: vi.fn(),
   submitRegistration: vi.fn(),
+  VolunteerRegistrationError: class VolunteerRegistrationError extends Error {
+    constructor(
+      public readonly code: string,
+      public readonly status = 400,
+    ) {
+      super(code)
+    }
+  },
 }))
 
-vi.mock('@/lib/volunteer-registration/service', () => ({
+vi.mock('../../src/lib/volunteer-registration/service', () => ({
   createFileDownload: mocks.createFileDownload,
   createInvitation: mocks.createInvitation,
   createUploadIntent: mocks.createUploadIntent,
@@ -19,37 +28,75 @@ vi.mock('@/lib/volunteer-registration/service', () => ({
   getPublicInvitation: mocks.getPublicInvitation,
   reviewVolunteer: mocks.reviewVolunteer,
   submitRegistration: mocks.submitRegistration,
-  VolunteerRegistrationError: class VolunteerRegistrationError extends Error {},
+  VolunteerRegistrationError: mocks.VolunteerRegistrationError,
 }))
 
-vi.mock('@/lib/volunteer-registration/rate-limit', () => ({
+vi.mock('../../src/lib/volunteer-registration/auth', () => ({
+  authenticatePayloadRequest: mocks.authenticatePayloadRequest,
+}))
+
+vi.mock('../../src/payload.config', () => ({ default: {} }))
+
+vi.mock('payload', () => ({ getPayload: vi.fn() }))
+
+vi.mock('../../src/lib/volunteer-registration/rate-limit', () => ({
   checkPublicRateLimit: mocks.checkPublicRateLimit,
 }))
 
-describe('admin volunteer invitation endpoint', () => {
-  it('uses a path that does not collide with the Payload collection CRUD route', async () => {
+vi.mock('@upstash/ratelimit', () => ({ Ratelimit: class Ratelimit {} }))
+
+vi.mock('@upstash/redis', () => ({ Redis: class Redis {} }))
+
+describe('volunteer invitation endpoints', () => {
+  it('removes the duplicate Payload endpoint that collides with collection CRUD', async () => {
     const { volunteerRegistrationEndpoints } = await import('@/endpoints/volunteerRegistration')
     const endpoint = volunteerRegistrationEndpoints.find(
       (candidate) => candidate.method === 'post' && candidate.path === '/volunteer-invitations/generate',
     )
 
-    expect(endpoint).toBeDefined()
+    expect(endpoint).toBeUndefined()
+  })
 
-    mocks.createInvitation.mockResolvedValue({ url: 'https://www.viralatinhas.com/volunteer/register/token-123' })
-    const req = {
-      json: vi.fn().mockResolvedValue({ expiresAt: '2026-10-16T00:00:00.000Z', maxUses: 1 }),
-      payload: { id: 'payload' },
-      user: { id: 'admin-1', role: 'Admin' },
-      headers: new Headers({ 'user-agent': 'test-agent/1.0' }),
-    }
+  it('authenticates and delegates invitation creation through the HTTP dispatcher', async () => {
+    const { createInvitationHttp } = await import('@/lib/volunteer-registration/http')
+    const payload = { id: 'payload' }
+    const req = { id: 'payload-request' }
+    const user = { id: 'admin-1', role: 'Admin' }
+    mocks.authenticatePayloadRequest.mockResolvedValue({ payload, req, user })
+    mocks.createInvitation.mockResolvedValue({
+      url: 'https://www.viralatinhas.com/volunteer/register/token-123',
+      expiresAt: '2026-10-16T00:00:00.000Z',
+    })
+    const request = new Request('https://www.viralatinhas.com/api/volunteer-invitations/generate', {
+      method: 'POST',
+      body: JSON.stringify({ expiresAt: '2026-10-16T00:00:00.000Z', maxUses: 1 }),
+    })
 
-    const response = await endpoint!.handler(req as any)
+    const response = await createInvitationHttp(request)
 
     expect(response.status).toBe(200)
-    expect(await response.json()).toEqual({ url: 'https://www.viralatinhas.com/volunteer/register/token-123' })
+    expect(await response.json()).toEqual({
+      url: 'https://www.viralatinhas.com/volunteer/register/token-123',
+      expiresAt: '2026-10-16T00:00:00.000Z',
+    })
+    expect(mocks.authenticatePayloadRequest).toHaveBeenCalledWith(request)
     expect(mocks.createInvitation).toHaveBeenCalledWith(
-      { payload: req.payload, req, user: req.user },
+      { payload, req, user },
       { expiresAt: '2026-10-16T00:00:00.000Z', maxUses: 1 },
     )
+  })
+
+  it('normalizes authentication errors from the HTTP dispatcher', async () => {
+    const { createInvitationHttp } = await import('@/lib/volunteer-registration/http')
+    mocks.authenticatePayloadRequest.mockRejectedValue(
+      new mocks.VolunteerRegistrationError('FORBIDDEN', 403),
+    )
+
+    const response = await createInvitationHttp(
+      new Request('https://www.viralatinhas.com/api/volunteer-invitations/generate', { method: 'POST' }),
+    )
+
+    expect(response.status).toBe(403)
+    expect(await response.json()).toEqual({ error: 'FORBIDDEN' })
   })
 })
