@@ -128,7 +128,7 @@ describeWithDatabase('volunteer registration with Payload and PostgreSQL', () =>
     expect(volunteer.cpfMasked).toBe('***.456.789-**')
     expect(volunteer.cpfEncrypted).toBeTruthy()
     expect(volunteer.cpfBlindIndex).toHaveLength(64)
-    expect(acceptance.docs[0]).toMatchObject({ ipAddress: '203.0.113.10', userAgent: 'integration-test/1.0', statement: ACCEPTANCE_STATEMENT, contentHashAtAcceptance: publicInvitation.term.contentHash })
+    expect(acceptance.docs[0]).toMatchObject({ ipAddress: '203.0.113.10', userAgent: 'integration-test/1.0', statement: ACCEPTANCE_STATEMENT, contentHashAtAcceptance: publicInvitation.term.contentHash, contentSnapshot: publicInvitation.term.content })
     expect(storedFiles.docs).toHaveLength(2)
     expect(storedFiles.docs.map((file: any) => file.id).sort()).toEqual(files.map((file) => file.fileId).sort())
     expect(audit.docs.some((event: any) => event.eventType === 'VOLUNTEER_SUBMITTED')).toBe(true)

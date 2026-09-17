@@ -12,6 +12,7 @@ export const VolunteerTermAcceptances: CollectionConfig = {
     { name: 'ipAddress', type: 'text', required: true, admin: { readOnly: true } },
     { name: 'userAgent', type: 'textarea', required: true, admin: { readOnly: true } },
     { name: 'contentHashAtAcceptance', type: 'text', required: true, admin: { readOnly: true } },
+    { name: 'contentSnapshot', type: 'textarea', maxLength: 100000, admin: { readOnly: true } },
     { name: 'statement', type: 'text', required: true, admin: { readOnly: true } },
     { name: 'signedDocument', type: 'text', admin: { readOnly: true } },
   ],

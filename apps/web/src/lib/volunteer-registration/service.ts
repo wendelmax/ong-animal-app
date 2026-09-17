@@ -1,4 +1,4 @@
-import { createCipheriv, createHash, randomBytes, randomUUID } from 'node:crypto'
+import { createCipheriv, createDecipheriv, createHash, randomBytes, randomUUID } from 'node:crypto'
 import { commitTransaction, initTransaction, killTransaction } from 'payload'
 import type { R2StoragePort } from '../storage/r2'
 import { r2Storage } from '../storage/r2'
@@ -116,6 +116,17 @@ const encryptCpf = (cpf: string) => {
   return Buffer.concat([iv, cipher.getAuthTag(), encrypted]).toString('base64')
 }
 
+export const decryptVolunteerCpf = (encryptedValue: string) => {
+  const rawKey = process.env.VOLUNTEER_CPF_ENCRYPTION_KEY
+  if (!rawKey) throw new VolunteerRegistrationError('CPF_ENCRYPTION_NOT_CONFIGURED', 503)
+  const key = Buffer.from(rawKey, 'base64')
+  const encoded = Buffer.from(encryptedValue, 'base64')
+  if (key.length !== 32 || encoded.length < 28) throw new VolunteerRegistrationError('CPF_ENCRYPTION_NOT_CONFIGURED', 503)
+  const decipher = createDecipheriv('aes-256-gcm', key, encoded.subarray(0, 12))
+  decipher.setAuthTag(encoded.subarray(12, 28))
+  return Buffer.concat([decipher.update(encoded.subarray(28)), decipher.final()]).toString('utf8')
+}
+
 const claimInvitation = async (ctx: PublicContext, invitation: any) => {
   const nextUsedCount = invitation.usedCount + 1
   const result = await ctx.payload.update({
@@ -146,7 +157,7 @@ async function submitRegistrationInTransaction(ctx: PublicContext, rawToken: str
   await claimInvitation(ctx, invitation)
   const volunteer = await ctx.payload.create({ collection: 'volunteers', data: { nome: input.fullName, whatsapp: input.phone, email: input.email, dataNascimento: input.birthDate, rg: input.rg, orgaoEmissor: input.rgIssuer, cpfEncrypted: encryptCpf(cpf), cpfBlindIndex: createCpfBlindIndex(cpf, pepper), cpfMasked: maskCpf(cpf), enderecoRua: input.addressStreet, enderecoBairro: input.addressNeighborhood, cidade: input.addressCity || 'Sumaré', cep: input.addressZipcode, funcao: legacyFunctionFromInput(input), areaAtuacao: input.activityArea, funcaoEspecifica: input.specificRole, dataIngresso: input.admittedAt || nowIso(), horasMediasMes: input.avgHoursPerMonth, sourceInvitation: invitation.id, status: 'PENDING_REVIEW', ativo: false, submittedAt: nowIso() }, overrideAccess: true, req: ctx.req })
   for (const file of files.docs) await ctx.payload.update({ collection: 'volunteer-files', id: file.id, data: { volunteer: volunteer.id }, overrideAccess: true, req: ctx.req })
-  await ctx.payload.create({ collection: 'volunteer-term-acceptances', data: { volunteer: volunteer.id, termVersion: term.id, acceptedAt: nowIso(), ipAddress: ctx.ipAddress, userAgent: ctx.userAgent, contentHashAtAcceptance: term.contentHash, statement: ACCEPTANCE_STATEMENT }, overrideAccess: true, req: ctx.req })
+  await ctx.payload.create({ collection: 'volunteer-term-acceptances', data: { volunteer: volunteer.id, termVersion: term.id, acceptedAt: nowIso(), ipAddress: ctx.ipAddress, userAgent: ctx.userAgent, contentHashAtAcceptance: term.contentHash, contentSnapshot: term.content, statement: ACCEPTANCE_STATEMENT }, overrideAccess: true, req: ctx.req })
   await audit(ctx, { eventType: 'VOLUNTEER_SUBMITTED', targetType: 'volunteers', targetId: volunteer.id, legalGround: 'LEGAL_OBLIGATION_ART_7_II_LGPD' })
   return { volunteerId: volunteer.id, status: 'PENDING_REVIEW' as const }
 }
