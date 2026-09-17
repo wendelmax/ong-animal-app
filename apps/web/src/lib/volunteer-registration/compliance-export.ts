@@ -13,6 +13,7 @@ type CgeCsvOptions = { includeCpf: boolean }
 
 const HEADER = ['Nome Completo', 'CPF', 'Área de Atuação', 'Função Específica', 'Data de Ingresso', 'Data de Desligamento', 'Horas/Mês', 'Status']
 const maskCpf = (value: string) => {
+  if (value.includes('*')) return value
   const digits = value.replace(/\D/g, '')
   return digits.length === 11 ? `***.${digits.slice(3, 6)}.${digits.slice(6, 9)}-**` : '***.***.***-**'
 }

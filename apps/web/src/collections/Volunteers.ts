@@ -103,6 +103,7 @@ export const Volunteers: CollectionConfig = {
     { name: 'areaAtuacao', type: 'text', label: 'Área de atuação' },
     { name: 'funcaoEspecifica', type: 'text', label: 'Função específica' },
     { name: 'dataIngresso', type: 'date', label: 'Data de ingresso', access: noDirectUpdate },
+    { name: 'dataDesligamento', type: 'date', label: 'Data de desligamento', access: noDirectUpdate },
     { name: 'horasMediasMes', type: 'number', label: 'Horas médias por mês', access: noDirectUpdate },
     { name: 'sourceInvitation', type: 'relationship', relationTo: 'volunteer-invitations', access: noDirectUpdate, admin: { readOnly: true } },
     {
