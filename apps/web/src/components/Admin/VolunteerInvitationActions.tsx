@@ -8,7 +8,7 @@ export function VolunteerInvitationActions() {
   const create = async () => {
     setMessage('Gerando…')
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
-    const response = await fetch('/api/volunteer-invitations', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ expiresAt, maxUses: 1 }) })
+    const response = await fetch('/api/volunteer-invitations/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ expiresAt, maxUses: 1 }) })
     if (!response.ok) { setMessage('Não foi possível gerar o convite.'); return }
     const data = await response.json()
     setLink(data.url)
