@@ -1,4 +1,4 @@
-import { createCipheriv, createHash, randomBytes, randomUUID } from 'node:crypto'
+import { createCipheriv, createDecipheriv, createHash, randomBytes, randomUUID } from 'node:crypto'
 import { commitTransaction, initTransaction, killTransaction } from 'payload'
 import type { R2StoragePort } from '../storage/r2'
 import { r2Storage } from '../storage/r2'
@@ -114,6 +114,17 @@ const encryptCpf = (cpf: string) => {
   const cipher = createCipheriv('aes-256-gcm', key, iv)
   const encrypted = Buffer.concat([cipher.update(cpf, 'utf8'), cipher.final()])
   return Buffer.concat([iv, cipher.getAuthTag(), encrypted]).toString('base64')
+}
+
+export const decryptVolunteerCpf = (encryptedValue: string) => {
+  const rawKey = process.env.VOLUNTEER_CPF_ENCRYPTION_KEY
+  if (!rawKey) throw new VolunteerRegistrationError('CPF_ENCRYPTION_NOT_CONFIGURED', 503)
+  const key = Buffer.from(rawKey, 'base64')
+  const encoded = Buffer.from(encryptedValue, 'base64')
+  if (key.length !== 32 || encoded.length < 28) throw new VolunteerRegistrationError('CPF_ENCRYPTION_NOT_CONFIGURED', 503)
+  const decipher = createDecipheriv('aes-256-gcm', key, encoded.subarray(0, 12))
+  decipher.setAuthTag(encoded.subarray(12, 28))
+  return Buffer.concat([decipher.update(encoded.subarray(28)), decipher.final()]).toString('utf8')
 }
 
 const claimInvitation = async (ctx: PublicContext, invitation: any) => {
