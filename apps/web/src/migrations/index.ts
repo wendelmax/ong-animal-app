@@ -4,6 +4,7 @@ import * as migration_20260916_231700_volunteer_term_acceptance_snapshot from '.
 import * as migration_20260916_234500_volunteer_resignation from './20260916_234500_volunteer_resignation'
 import * as migration_20260917_000100_volunteer_whatsapp from './20260917_000100_volunteer_whatsapp'
 import * as migration_20260917_000200_volunteer_legacy_fields from './20260917_000200_volunteer_legacy_fields'
+import * as migration_20260917_000300_volunteer_base_fields from './20260917_000300_volunteer_base_fields'
 
 export const migrations = [
   {
@@ -35,5 +36,10 @@ export const migrations = [
     up: migration_20260917_000200_volunteer_legacy_fields.up,
     down: migration_20260917_000200_volunteer_legacy_fields.down,
     name: '20260917_000200_volunteer_legacy_fields',
+  },
+  {
+    up: migration_20260917_000300_volunteer_base_fields.up,
+    down: migration_20260917_000300_volunteer_base_fields.down,
+    name: '20260917_000300_volunteer_base_fields',
   },
 ]
