@@ -17,3 +17,5 @@ export function VolunteerReviewActions({ volunteerId: explicitVolunteerId }: { v
   return <div className="flex flex-wrap items-center gap-2"><button type="button" onClick={() => void review('APPROVE')} className="rounded-lg bg-emerald-600 px-3 py-2 text-sm font-bold text-white">Aprovar</button><input value={reason} onChange={(event) => setReason(event.target.value)} placeholder="Motivo se rejeitar" aria-label="Motivo da rejeição" className="rounded-lg border border-zinc-300 px-3 py-2 text-sm" /><button type="button" onClick={() => void review('REJECT')} className="rounded-lg bg-red-600 px-3 py-2 text-sm font-bold text-white">Rejeitar</button>{volunteerId && <a href={`/voluntarios/imprimir/${encodeURIComponent(volunteerId)}`} target="_blank" rel="noreferrer" className="rounded-lg border border-zinc-400 px-3 py-2 text-sm font-bold text-zinc-800">Imprimir termo</a>}{message && <span className="text-sm font-semibold">{message}</span>}</div>
 }
 
+export default VolunteerReviewActions
+
