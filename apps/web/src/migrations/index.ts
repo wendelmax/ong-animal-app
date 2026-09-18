@@ -3,6 +3,7 @@ import * as migration_20260916_033156_production_schema_compatibility from './20
 import * as migration_20260916_231700_volunteer_term_acceptance_snapshot from './20260916_231700_volunteer_term_acceptance_snapshot'
 import * as migration_20260916_234500_volunteer_resignation from './20260916_234500_volunteer_resignation'
 import * as migration_20260917_000100_volunteer_whatsapp from './20260917_000100_volunteer_whatsapp'
+import * as migration_20260917_000200_volunteer_legacy_fields from './20260917_000200_volunteer_legacy_fields'
 
 export const migrations = [
   {
@@ -29,5 +30,10 @@ export const migrations = [
     up: migration_20260917_000100_volunteer_whatsapp.up,
     down: migration_20260917_000100_volunteer_whatsapp.down,
     name: '20260917_000100_volunteer_whatsapp',
+  },
+  {
+    up: migration_20260917_000200_volunteer_legacy_fields.up,
+    down: migration_20260917_000200_volunteer_legacy_fields.down,
+    name: '20260917_000200_volunteer_legacy_fields',
   },
 ]

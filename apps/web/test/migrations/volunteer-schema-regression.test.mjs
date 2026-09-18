@@ -19,3 +19,22 @@ test('keeps the volunteers whatsapp column compatible with production', async ()
     'Expected an incremental migration that creates volunteers.whatsapp when absent',
   )
 })
+
+test('keeps the legacy temporary-home fields compatible with production', async () => {
+  const migrationFiles = (await readdir(migrationsDirectory)).filter((file) => file.endsWith('.ts'))
+  const migrationSources = await Promise.all(
+    migrationFiles.map((file) => readFile(join(migrationsDirectory, file), 'utf8')),
+  )
+  const migrationSource = migrationSources.join('\n')
+
+  assert.match(
+    migrationSource,
+    /ALTER TABLE\s+"volunteers"\s+ADD COLUMN IF NOT EXISTS\s+"is_l_t"\s+boolean/,
+    'Expected an incremental migration that creates volunteers.is_l_t when absent',
+  )
+  assert.match(
+    migrationSource,
+    /ALTER TABLE\s+"volunteers"\s+ADD COLUMN IF NOT EXISTS\s+"capacidade_l_t"\s+numeric/,
+    'Expected an incremental migration that creates volunteers.capacidade_l_t when absent',
+  )
+})
