@@ -38,3 +38,17 @@ test('keeps the legacy temporary-home fields compatible with production', async 
     'Expected an incremental migration that creates volunteers.capacidade_l_t when absent',
   )
 })
+
+test('keeps the legacy volunteer profile fields compatible with production', async () => {
+  const migrationFiles = (await readdir(migrationsDirectory)).filter((file) => file.endsWith('.ts'))
+  const migrationSources = await Promise.all(
+    migrationFiles.map((file) => readFile(join(migrationsDirectory, file), 'utf8')),
+  )
+  const migrationSource = migrationSources.join('\n')
+
+  assert.match(migrationSource, /ADD COLUMN IF NOT EXISTS\s+"endereco"\s+varchar/)
+  assert.match(migrationSource, /ADD COLUMN IF NOT EXISTS\s+"cidade"\s+varchar/)
+  assert.match(migrationSource, /ADD COLUMN IF NOT EXISTS\s+"funcao"\s+"enum_volunteers_funcao"/)
+  assert.match(migrationSource, /ADD COLUMN IF NOT EXISTS\s+"disponibilidade"\s+varchar/)
+  assert.match(migrationSource, /ADD COLUMN IF NOT EXISTS\s+"ativo"\s+boolean/)
+})
