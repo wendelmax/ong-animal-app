@@ -28,12 +28,13 @@ import { Categories } from './collections/Categories'
 import { Header } from './globals/Header'
 import { Footer } from './globals/Footer'
 import { volunteerRegistrationEndpoints } from './endpoints/volunteerRegistration'
+import { nodepressExportEndpoint } from './endpoints/nodepressExport'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
 export default buildConfig({
-  endpoints: volunteerRegistrationEndpoints,
+  endpoints: [...volunteerRegistrationEndpoints, nodepressExportEndpoint],
   admin: {
     user: Users.slug,
     importMap: {
